@@ -1,0 +1,88 @@
+﻿<title>算分码管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a><cite>算分码管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="calculatecode-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button class="layui-btn btn-calculatecode" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="calculatecode-table" lay-filter="calculatecode-table"></table>
+            <script type="text/html" id="table-operation-btn">
+                <div class="layui-btn-group">
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </div>
+            </script>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('calculatecode', layui.factory('calculatecode')).use(['admin', 'calculatecode', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        //搜索
+        form.on('submit(calculatecode-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('calculatecode-table', {
+                where: field,
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['500px', '250px']
+                    , resize: true
+                    , success: function (layero, index) {
+                        view(this.id).render('content/calculatecode/add').done(function () {
+                            form.render();
+                            //监听提交
+                            form.on('submit(calculatecode-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.calculatecode.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        layui.table.reload('calculatecode-table');
+                                    }
+                                    layer.msg(res.message);
+                                }, function (error) {
+                                    layer.msg(error.msg);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-calculatecode').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

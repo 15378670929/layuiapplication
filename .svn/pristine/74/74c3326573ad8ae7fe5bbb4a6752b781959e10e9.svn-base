@@ -1,0 +1,297 @@
+﻿/**
+ @Name：能力维度管理
+ */
+layui.define(['form', 'common', 'setter', 'upload', 'laydate', 'treeGrid', 'colorpicker', 'treeSelect', 'verification'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , common = layui.common
+        , setter = layui.setter
+        , treeGrid = layui.treeGrid
+        , colorpicker = layui.colorpicker
+        , treeSelect = layui.treeSelect
+        , upload = layui.upload
+        , form = layui.form;
+
+    treeGrid.set({ headers: { Authorization: "Bearer " + sessionStorage.access_token } });
+
+    treeGrid.render({
+        id: "dicability-table"
+        , elem: '#dicability-table'
+        , url: setter.apiAddress.ability.selname
+        , idField: 'id'
+        , treeId: 'id'
+        , treeUpId: 'parentId'
+        , treeShowName: 'name'
+        , isFilter: false
+        , iconOpen: false
+        , isOpenDefault: false
+        , loading: true
+        , method: 'get'
+        , isPage: false
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , cols: [[
+            { field: 'name', title: '能力维度' }
+            , {
+                field: 'levelNumber', title: '等级', width: 100, align: 'center', templet: function (d) {
+                    if (d.levelNumber == 0) { return '-' }
+                    else { return d.levelNumber }
+                }
+            }
+            , {
+                field: 'icon', title: '图标', width: 100, align: 'center', templet: function (d) {
+                    if (d.icon != null && d.icon != "") {
+                        return '<img style="width:26px;display: inline-block;" class="layui-upload-img" src=' + d.icon + '>'
+                    } return ""
+                }
+            }
+            , {
+                field: 'color', title: '颜色', width: 80, align: 'center'
+                , templet: function (d) {
+                    return '<span style="width:auto;background-color: ' + d.color + ';padding: 25px;display: inline-block;"></span>'
+                }
+            }
+            , { field: 'shortDescription', title: '短描述' }
+            , { field: 'longDescription', title: '长描述'}
+            , {
+                field: 'status', title: '状态', width: 100, align: 'center', templet: function (d) { return d.status == 0 ? '<span style="color:#FF5722;">禁用</span>' : '<span style="color:#009688;">启用</span>' }
+            }
+            , {
+                width: 200, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    if (d.status) {
+                        htmlButton.push('<a class="layui-btn  layui-btn-danger layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-delete"></i>禁用</a>');
+                    } else {
+                        htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                    }
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , parseData: function (res) {
+            return {
+                "code": res.code,
+                "msg": res.message,
+                "data": res.data
+            };
+        }
+        , text: {
+            none: '暂无相关数据'
+        }
+    });
+
+    form.render("select");
+
+    //搜索
+    form.on('submit(dicability-search)', function (data) {
+        //执行重载
+        treeGrid.reload('dicability-table', {
+            where: {
+                levelNumber: $("#levelNumber").val(),
+                name: $("#name").val()
+            },
+            page: {
+                curr: 1 //重新从第 1 页开始
+            }
+        });
+    });
+
+    //编辑&删除
+    treeGrid.on('tool(dicability-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'del') {
+            layer.confirm('确定删除？', function (index) {
+                common.ajax(setter.apiAddress.ability.delete, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        treeGrid.reload('dicability-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'changestatus') {
+            var titletext = "确认禁用？";
+            if (!data.status) {
+                titletext = "确认启用？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.ability.updatestatus, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        treeGrid.reload('dicability-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑'
+                , area: ['500px', '68%']
+                , resize: true
+                , success: function (layero, index) {
+                    view(this.id).render('content/dicability/edit', data).done(function () {
+                        initTree(data.parentId);
+                        colorpicker.render({
+                            elem: '#abilitycolor'
+                            , color: data.color
+                            , done: function (color) {
+                                $('#color').val(color);
+                            }
+                        });
+                        //普通图片上传
+                        upload.render({
+                            elem: '#uploadicon'
+                            , url: setter.apiAddress.image.imageupload+"?filePath=content/dicability/edit"
+                            , field: "imgFile"
+                            , accept: 'file'
+                            , size: 2048
+                            , exts: 'jpg|png'
+                            , data: { imgType: "1" }
+                            , before: function (obj) {
+                                obj.preview(function (index, file, result) {
+                                    $('#showicon').attr('src', result); //图片链接（base64）
+                                    $('#showicon').css('width', '80px');
+                                });
+                            }
+                            , done: function (res) {
+                                if (res.code == 200) {
+                                    $("#icon").val(res.data.src);
+                                    layer.msg(res.msg);
+                                }
+                            }
+                            , error: function (e) {
+                                layer.msg("上传失败!");
+                            }
+                        });
+                        form.render();
+                        //监听提交
+                        form.on('submit(dicability-form-submit)', function (data) {
+                            if ($("#icon").val() == "") {
+                                layer.msg("请上传图标");
+                            } else {
+                                common.ajax(setter.apiAddress.ability.update, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        treeGrid.reload('dicability-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        }
+    });
+
+    //事件
+    var active = {
+        add: function () {
+            admin.popup({
+                title: '添加'
+                , area: ['500px', '68%']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('content/dicability/add').done(function () {
+                        initTree("");
+                        colorpicker.render({
+                            elem: '#abilitycolor'
+                            , color: '#1c97f5'
+                            , done: function (color) {
+                                $('#color').val(color);
+                            }
+                        });
+                        //普通图片上传
+                        upload.render({
+                            elem: '#uploadicon'
+                            , url: setter.apiAddress.image.imageupload+"?filePath=content/dicability/add"
+                            , field: "imgFile"
+                            , accept: 'file'
+                            , size: 2048
+                            , exts: 'jpg|png'
+                            , data: { imgType: "1" }
+                            , before: function (obj) {
+                                obj.preview(function (index, file, result) {
+                                    $('#showicon').attr('src', result); //图片链接（base64）
+                                    $('#showicon').css('width', '80px');
+                                });
+                            }
+                            , done: function (res) {
+                                if (res.code == 200) {
+                                    $("#icon").val(res.data.src);
+                                    layer.msg(res.msg);
+                                }
+                            }
+                            , error: function (e) {
+                                layer.msg("上传失败!");
+                            }
+                        });
+                        //监听提交
+                        form.on('submit(dicability-form-submit)', function (data) {
+                            $("#abilityType").removeAttr("disabled").css("background-color", "#EEEEEE;");;
+                            if ($("#icon").val() == "") {
+                                layer.msg("请上传图标");
+                            } else {
+                                common.ajax(setter.apiAddress.ability.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        treeGrid.reload('dicability-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        }
+    };
+
+    $('.layui-btn.btn-dicability').on('click', function () {
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+
+    function initTree(nodeId) {
+        treeSelect.render({
+            elem: '#dicabilitytype-tree',
+            url: setter.apiAddress.ability.seltree,
+            type: 'get',
+            placeholder: '请选择',
+            style: {
+                folder: {
+                    enable: true
+                },
+                line: {
+                    enable: true
+                }
+            },
+            search: true,
+            click: function (data) {
+                $("#abilityId").val(data.current.id);
+                if (data.current.name === "添加能力类型") {
+                    $("#level").val(data.current.level)
+                } else {
+                    $("#level").val(data.current.level + 1)
+                }
+            },
+            success: function (data) {
+                treeObj = treeSelect.zTree('dicabilitytype-tree');
+                var defaultNode = { id: "00000000-0000-0000-0000-000000000000", name: "添加能力类型" };
+                treeObj.addNodes(null, 0, defaultNode);
+                if (nodeId != "") {
+                    var node = treeObj.getNodeByParam('id', nodeId);
+                    treeObj.selectNode(node, true);
+                    treeObj.checkNode(node, true, true);
+                    $(".layui-unselect").val(node.name);
+                }
+
+            }
+        });
+    }
+
+    exports('dicability', {})
+});

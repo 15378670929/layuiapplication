@@ -1,0 +1,586 @@
+﻿/**
+ @Name：题目壳管理
+ */
+layui.define(['table', 'form', 'common', 'setter', 'laydate', 'verification', 'element', 'upload'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , element = layui.element
+        , laydate = layui.laydate
+        , upload = layui.upload
+        , form = layui.form;
+
+    table.render({
+        elem: '#questions-group-table'
+        , url: setter.apiAddress.questiongroup.pagelist
+        , cols: [[
+            { field: 'name', title: '名称' },
+            {
+                field: 'templateName', title: '模板名称', templet: function (d) {
+                    if (d.questionGroupTemplateDto != null) {
+                        return d.questionGroupTemplateDto.name
+                    } else {
+                        return ''
+                    }
+                }
+            },
+            {
+                field: 'finishType', title: '完成方式', align: 'center',
+                templet: function (d) { 
+                    if (d.finishType == 1) {
+                        return "<span style='color:#1E9FFF;'>不限时</span>";
+                    } if (d.finishType == 2) {
+                        return "<span style='color:#009688;'>限时</span>";
+                    } if (d.finishType == 3) {
+                        return "<span style='color:#FFB800;'>随时提交</span>";
+                    } else  {
+                        return "";
+                    }
+                }
+            },
+            { field: 'abilityTypeText', title: '能力类型' },
+            { field: 'firstAbilityText', title: '一级能力' },
+            { field: 'secondAbilityText', title: '二级能力' },
+            { field: 'pushQuestionNum', title: '取题数量', align: 'center' },
+            { field: 'endTime', title: '结束时长', align: 'center' },
+            { field: 'version', title: '版本', align: 'center' },
+            {
+                field: 'id', title: '年龄范围', align: 'center', templet: function (d) {
+                    return d.minAge + "~" + d.maxAge + "岁";
+                }
+            },
+            { field: 'normCount', title: '常模数', align: 'center' },
+            { field: 'courseCount', title: '关联课程', align: 'center' },
+            {
+                field: 'status', title: '状态', align: 'center',
+                templet: function (d) { return d.status == 1 ? '<span style="color:#009688;">启用</span>' : '<span style="color:#FF5722;">禁用</span>'; }
+            },
+            {
+                field: 'createTime', width: 150, title: '创建时间', sort: true, templet: function (d) {
+                    return common.formatDate(d.createTime, "yyyy-MM-dd hh:mm")
+                }
+            },
+            {
+                width: 300, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="read"><i class="layui-icon layui-icon-read"></i>预览</a>');
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="norm"><i class="layui-icon layui-icon-template"></i>常模</a>');
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="setting"><i class="layui-icon layui-icon-set"></i>题目</a>');
+                    if (d.status) {
+                        htmlButton.push('<a class="layui-btn  layui-btn-danger layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-close"></i>禁用</a>');
+                    } else {
+                        htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                    }
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: true
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.data.totalCount,
+                "data": res.data.items
+            };
+        }
+    });
+
+    //能力选择
+    var pageInit = {
+        initabtype: function (id) {
+            common.ajax(setter.apiAddress.ability.selname, "GET", "", { level: 0 }, function (res) {
+                common.select(id, res.data, "", 1);
+                form.render("select");
+            });
+        },
+        initFirstAbilities: function (data, fad, sad) {
+            $("#" + fad + "").empty();
+            $("#" + sad + "").empty();
+            if (data.value != "") {
+                common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                    common.select(fad, res.data, "", 1);
+                    form.render("select");
+                });
+            } else {
+                $("#" + fad + "").empty();
+                $("#" + sad + "").empty();
+                form.render("select");
+            }
+        },
+        initSecondAbilities: function (data, sad) {
+            $("#" + sad + "").empty();
+            if (data.value != "") {
+                common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                    common.select(sad, res.data, "", 1);
+                    form.render("select");
+                });
+            } else {
+                common.select(sad, [{ id: "", name: "" }], 1, 1);
+                form.render("select");
+            }
+        }
+    };
+
+    //普通图片上传
+    function uploadInst(id, showicon, icon) {
+        upload.render({
+            elem: '#' + id
+            , url: setter.apiAddress.image.imageupload + "?filePath=content/questiongroup/edit"
+            , field: "imgFile"
+            , accept: 'file'
+            , size: 2048
+            , exts: 'jpg|png'
+            , before: function (obj) {
+                obj.preview(function (index, file, result) {
+                    $('#' + showicon).attr('src', result);
+                    $('#' + showicon).attr('width', '80px');
+                });
+            }
+            , done: function (res) {
+                if (res.code == 200) {
+                    $("#" + icon).val(res.data.src);
+                    layer.msg(res.msg);
+                }
+            }
+            , error: function (e) {
+                layer.msg("上传失败!");
+            }
+        });
+    }
+
+    //编辑&修改状态
+    table.on('tool(questions-group-table)', function (obj) {
+        var data = obj.data;
+        var rowdata = data;
+        console.log(setter.apiurl)
+        if (obj.event === 'changestatus') {
+            var titletext = "确认禁用？";
+            if (!data.status) {
+                titletext = "确认启用？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.questiongroup.updatestatus, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        layui.table.reload('questions-group-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'setting') {
+            admin.popup({
+                title: '题目管理'
+                , area: ['1314px', '98%']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('content/questiongroup/questionsetting', data).done(function () {
+                        //题目壳所选题目
+                        table.render({
+                            elem: '#questionconfig-table'
+                            , id: 'configId'
+                            , url: setter.apiAddress.questiongroup.questionbyidlist
+                            , cols: [[
+                                { type: 'checkbox' },
+                                {
+                                    field: 'name', title: '题目名称', templet: function (d) {
+                                        if (d.questionDto != null) { return d.questionDto.name } return ""
+                                    }
+                                },
+                                {
+                                    field: 'questionTypeId', title: '题目类型',
+                                    templet: function (d) {
+                                        if (d.questionDto != null) {
+                                            switch (d.questionDto.questionType) {
+                                                case 1:
+                                                    return "单选题";
+                                                    break;
+                                                case 2:
+                                                    return "多选题";
+                                                    break;
+                                                case 3:
+                                                    return "量表题";
+                                                    break;
+                                                case 4:
+                                                    return "矩阵单选";
+                                                    break;
+                                                case 5:
+                                                    return "矩阵多选";
+                                                    break;
+                                                case 6:
+                                                    return "矩阵量表";
+                                                    break;
+                                                default:
+                                                    return "-";
+                                                    break;
+                                            }
+                                        } return "-"
+                                    }
+                                },
+                                {
+                                    field: 'abilityTypeText', title: '能力类型', templet: function (d) {
+                                        if (d.questionDto != null) { return d.questionDto.abilityTypeText } return ""
+                                    }
+                                },
+                                {
+                                    field: 'firstAbilityText', title: '一级能力', templet: function (d) {
+                                        if (d.questionDto != null) { return d.questionDto.firstAbilityText } return ""
+                                    }
+                                },
+                                {
+                                    field: 'secondAbilityText', title: '二级能力', templet: function (d) {
+                                        if (d.questionDto != null) { return d.questionDto.secondAbilityText } return ""
+                                    }
+                                },
+                                {
+                                    field: 'version', title: '版本', align: 'center', templet: function (d) {
+                                        if (d.questionDto != null) { return d.questionDto.version } return ""
+                                    }
+                                },
+                                {
+                                    field: 'degreeOfDifficulty', title: '难度系数', align: 'center', templet: function (d) {
+                                        if (d.questionDto != null) { return d.questionDto.degreeOfDifficulty } return ""
+                                    }
+                                },
+                                {
+                                    field: 'displayOrder', title: '排序', align: 'center'
+                                }
+                                ,
+                                {
+                                    title: '操作', align: 'center', width: 150
+                                    , templet: function (d) {
+                                        var htmlButton = new Array();
+                                        htmlButton.push('<div class="layui-btn-group">')
+                                        if (d.questionGroupDto.orderType == 2) {
+                                            htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="questiondorder"><i class="layui-icon layui-icon-edit"></i>排序</a>');
+                                        } else {
+                                            htmlButton.push('<a class="layui-btn layui-btn-disabled layui-btn-xs" lay-event=""><i class="layui-icon layui-icon-edit"></i>排序</a>');
+                                        }
+                                        htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="questiondel"><i class="layui-icon layui-icon-delete"></i>删除</a>');
+                                        htmlButton.push('</div>')
+                                        return htmlButton.join('');
+                                    }
+                                }
+                            ]]
+                            , where: { id: data.id }
+                            , page: true
+                            , text: {
+                                none: '暂无相关数据'
+                            }
+                            , response: {
+                                statusCode: 200
+                            }
+                            , parseData: function (res) {
+                                return {
+                                    "code": res.statusCode,
+                                    "msg": res.message,
+                                    "count": res.data.totalCount,
+                                    "data": res.data.items
+                                };
+                            }
+                        });
+                        var models = [];
+                        //批量删除
+                        var active = {
+                            questiondels: function () {
+                                var checkStatus = table.checkStatus('configId');
+                                if (checkStatus.data.length > 0) {
+                                    layer.confirm('一共选择' + checkStatus.data.length + '个题目，确定删除？', function (index) {
+                                        var models = [];
+                                        var questiondata = checkStatus.data;
+                                        for (var i = 0; i < questiondata.length; i++) {
+                                            models.push({ Id: questiondata[i].id });
+                                        }
+
+                                        common.ajax(setter.apiAddress.questiongroup.deleteconfigs, "POST", "", { models: models }, function (res) {
+                                            if (res.statusCode == 200) {
+                                                layer.close(index);
+                                                table.reload('configId');
+                                            }
+                                            layer.msg(res.message);
+                                        });
+                                    });
+                                } else {
+                                    layer.msg("请选择题目");
+                                }
+                            }
+                        };
+                        $('.layui-btn.btn-config-group').on('click', function () {
+                            var type = $(this).data('type');
+                            active[type] ? active[type].call(this) : '';
+                        });
+                        //题目列表操作
+                        table.on('tool(questionconfig-table)', function (obj) {
+                            var rowquestiondata = obj.data;
+                            if (obj.event === 'questiondel') {
+                                layer.confirm('确定删除？', function (index) {
+                                    if (rowquestiondata.id != "") {
+                                        models.push({ Id: rowquestiondata.id });
+                                        common.ajax(setter.apiAddress.questiongroup.deleteconfig, "POST", "", { models: models }, function (res) {
+                                            if (res.statusCode == 200) {
+                                                layer.close(index);
+                                                table.reload('configId');
+                                            }
+                                            layer.msg(res.message);
+                                        });
+                                    } else { layer.msg("删除数据异常"); }
+                                });
+                            } else if (obj.event === 'questiondorder') {
+                                layer.open({
+                                    title: "题目排序"
+                                    , resize: false
+                                    , content: '<input type="text" id="displayOrder" value="' + rowquestiondata.displayOrder + '" name="DisplayOrder" placeholder="请输入数字" class="layui-input">'
+                                    , btn: ['确定', '取消']
+                                    , yes: function (index, layero) {
+                                        var order = $("#displayOrder").val();
+                                        var reg = /^[-+]?\d*$/;
+                                        if (!reg.test(order) || order < 0 || order > 99) {
+                                            layer.tips("请输入0-99的整数", '#displayOrder');
+                                            return false;
+                                        } else {
+                                            common.ajax(setter.apiAddress.questiongroup.updateorder, "POST", "", { id: rowquestiondata.id, displayOrder: order }, function (res) {
+                                                if (res.statusCode == 200) {
+                                                    layer.close(index);
+                                                    table.reload('configId');
+                                                }
+                                                layer.msg(res.message);
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        //切换
+                        element.on('tab(question-tab)', function (data) {
+                            if (data.index == 1) {
+                                $("#atp").empty();
+                                $("#fad").empty();
+                                $("#sad").empty();
+                                //渲染题目列表
+                                table.render({
+                                    elem: '#questions-table'
+                                    , id: 'quesitionId'
+                                    , url: setter.apiAddress.question.pagelist
+                                    , cols: [[
+                                        { type: 'checkbox' },
+                                        { field: 'name', title: '名称' },
+                                        {
+                                            field: 'questionTypeId', title: '题目类型',
+                                            templet: function (d) {
+                                                switch (d.questionType) {
+                                                    case 1:
+                                                        return "单选题";
+                                                        break;
+                                                    case 2:
+                                                        return "多选题";
+                                                        break;
+                                                    case 3:
+                                                        return "量表题";
+                                                        break;
+                                                    case 4:
+                                                        return "矩阵单选";
+                                                        break;
+                                                    case 5:
+                                                        return "矩阵多选";
+                                                        break;
+                                                    case 6:
+                                                        return "矩阵量表";
+                                                        break;
+                                                    default:
+                                                        return "-";
+                                                        break;
+                                                }
+                                            }
+                                        },
+                                        { field: 'abilityTypeText', title: '能力类型' },
+                                        { field: 'firstAbilityText', title: '一级能力' },
+                                        { field: 'secondAbilityText', title: '二级能力' },
+                                        { field: 'version', title: '版本', align: 'center' },
+                                        { field: 'degreeOfDifficulty', title: '难度系数', align: 'center' }
+                                    ]]
+                                    , where: { groupId: rowdata.id }
+                                    , page: true
+                                    , text: {
+                                        none: '暂无相关数据'
+                                    }
+                                    , cellMinWidth: 130
+                                    , response: {
+                                        statusCode: 200
+                                    }
+                                    , parseData: function (res) {
+                                        return {
+                                            "code": res.statusCode,
+                                            "msg": res.message,
+                                            "count": res.data.totalCount,
+                                            "data": res.data.items
+                                        };
+                                    }
+                                });
+                                //获取能力类型
+                                pageInit.initabtype("atp");
+                                //获取一级能力
+                                form.on('select(topfilter)', function (data) {
+                                    pageInit.initFirstAbilities(data, "fad", "sad");
+                                });
+                                //获取二级能力
+                                form.on('select(firstfilter)', function (data) {
+                                    pageInit.initSecondAbilities(data, "sad");
+                                });
+                                //搜索
+                                form.on('submit(questions-group-search)', function (data) {
+                                    //执行重载
+                                    table.reload('quesitionId', {
+                                        where: {
+                                            abilityTypeId: $("#atp").val(),
+                                            firstAbilityId: $("#fad").val(),
+                                            secondAbilityId: $("#sad").val()
+                                        },
+                                        page: {
+                                            curr: 1 //重新从第 1 页开始
+                                        }
+                                    });
+                                });
+
+                                var active = {
+                                    questionconfig: function () {
+                                        var checkStatus = table.checkStatus('quesitionId');
+                                        if (checkStatus.data.length > 0) {
+                                            layer.confirm('一共选择' + checkStatus.data.length + '个题目，确定添加？', function (index) {
+                                                var models = [];
+                                                var questiondata = checkStatus.data;
+                                                for (var i = 0; i < questiondata.length; i++) {
+                                                    models.push({ questionGroupId: rowdata.id, questionId: questiondata[i].id, displayOrder: '0' });
+                                                }
+                                                common.ajax(setter.apiAddress.questiongroup.addquestionconfig, "POST", "", { models: models }, function (res) {
+                                                    if (res.statusCode == 200) {
+                                                        element.tabChange('question-tab', '0');
+                                                        table.reload('configId');
+                                                    }
+                                                    layer.msg(res.message);
+                                                });
+                                            });
+                                        } else {
+                                            layer.msg("请选择题目");
+                                        }
+                                    }
+                                };
+
+                                $('.layui-btn.btn-questions-group').on('click', function () {
+                                    var type = $(this).data('type');
+                                    active[type] ? active[type].call(this) : '';
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑'
+                , area: ['50%', '100%']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('content/questiongroup/edit', data).done(function () {
+                        //时间选择器
+                        laydate.render({
+                            elem: '#endTime'
+                            , type: 'time'
+                        });
+                        $("#remark").val(data.remark);
+                        //题目壳模板
+                        common.ajax(setter.apiAddress.questiongrouptemplate.loadall, "GET", "", {}, function (res) {
+                            common.select("grouptemplateId", res.data, data.grouptemplateId, 1);
+                            form.render("select");
+                        });
+                        //获取算分码
+                        common.ajax(setter.apiAddress.calculatecode.loadall, "Get", "", {}, function (res) {
+                            $.each(res.data, function (index, item) {
+                                if (item.code == data.exerciseCalculateCode) {
+                                    $("#code").append("<option selected value=\"" + item.id + "\">" + item.code + "</option>");
+                                }
+                                else {
+                                    $("#code").append("<option value=\"" + item.id + "\">" + item.code + "</option>");
+                                }
+                            });
+                            form.render("select");
+                        });
+                        //选择算分码
+                        form.on('select(codefilter)', function (data) {
+                            $("#calculateCode").val(data.elem[data.elem.selectedIndex].text);
+                        });
+                        //获取顶级能力
+                        common.ajax(setter.apiAddress.ability.selname, "GET", "", { level: 0 }, function (res) {
+                            common.select("abilityType", res.data, data.abilityTypeId, 1);
+                            //获取一级能力
+                            common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.abilityTypeId }, function (res) {
+                                common.select("firstAbilities", res.data, data.firstAbilityId, 2);
+                                form.render("select");
+                            });
+                            //获取二级能力
+                            common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.firstAbilityId }, function (res) {
+                                common.select("secondAbilities", res.data, data.secondAbilityId, 3);
+                                form.render("select");
+                            });
+                            form.render("select");
+                        });
+                        // 调用生成获取图片模态框
+                        uploadInst("uploadicon", "showicon", "icon");
+                        uploadInst("uploadcoverPlanUri", "showcoverPlanUri", "coverPlanUri");
+                        //获取一级能力
+                        form.on('select(abilityType-filter)', function (data) {
+                            pageInit.initFirstAbilities(data, "firstAbilities", "secondAbilities");
+                        });
+                        //获取二级能力
+                        form.on('select(firstAbilities-filter)', function (data) {
+                            pageInit.initSecondAbilities(data, "secondAbilities");
+                        });
+                        $("input[name=Status][value=false]").attr("checked", data.status == 0 ? true : false);
+                        $("input[name=Status][value=true]").attr("checked", data.status == 1 ? true : false);
+                        $("input[name=OrderType][value=1]").attr("checked", data.orderType == "1" ? true : false);
+                        $("input[name=OrderType][value=2]").attr("checked", data.orderType == "2" ? true : false);
+                        $("select[name=FinishType]").val(data.finishType);
+                        form.render();
+                        //监听提交
+                        form.on('submit(questiongroup-edit-form-submit)', function (data) {
+                            if ($("#icon").val() == "" || $("#coverPlanUri").val() == "") {
+                                layer.msg("请上传图片");
+                            } else {
+                                common.ajax(setter.apiAddress.questiongroup.update, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        table.reload('questions-group-table'); //重载表格
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        } else if (obj.event === 'norm') {
+            location.hash = '/content/questiongroup/norm/exerciseId=' + data.id + '';
+        } else if (obj.event === 'read') {
+            if (null !== rowdata.questionGroupTemplateDto) {
+                window.open(rowdata.questionGroupTemplateDto.url + '?questionGroupId='+ rowdata.id + '&url=' + setter.apiurl);
+            } else {
+                layer.msg("未选择模板");
+            }
+        }
+    });
+    exports('questiongroup', {})
+});

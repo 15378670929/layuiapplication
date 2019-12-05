@@ -1,0 +1,165 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="reroute-edit-form" lay-filter="reroute-edit-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">对应网关</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="hidden" id="Id" name="Id" value="{{ d.params.id || '' }}" />
+                <input type="hidden" id="HiddenGatewayId" name="HiddenGatewayId" value="{{ d.params.gatewayId || '' }}" />
+            </script>
+            <select class="sel" id="reroute-edit-sel" name="GatewayId" lay-verify="required|select" placeholder="请选择网关"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上游路径<label style="color:red;">*</label></label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" name="UpstreamPathTemplate" value="{{ d.params.upstreamPathTemplate || '' }}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上游方法<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea name="UpstreamHttpMethod" lay-verify="required" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.upstreamHttpMethod),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">上游域名</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="UpstreamHost" value="{{d.params.upstreamHost || '' }}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游架构<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="DownstreamScheme" value="{{ d.params.downstreamScheme || '' }}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游路径<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="DownstreamPathTemplate" value="{{ d.params.downstreamPathTemplate || '' }}" lay-verify="required" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游地址</label>
+        <!--如果启用服务发现，则不需要配置下游服务的信息-->
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.downstreamHostAndPorts !=""){}}
+                <textarea name="DownstreamHostAndPorts" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.downstreamHostAndPorts),null,2) }}</textarea>
+                {{# }else{ }}
+                <textarea name="DownstreamHostAndPorts" class="layui-textarea"></textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">授权配置</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.authenticationOptions !=""){}}
+                <textarea name="AuthenticationOptions" lay-verify="required" placeholder="" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.authenticationOptions),null,2) }}</textarea>
+                {{# }else{ }}
+                <textarea name="AuthenticationOptions" class="layui-textarea"></textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">全局key</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.requestIdKey !=""){}}
+                <input type="text" name="RequestIdKey" value="{{ JSON.stringify(JSON.parse(d.params.requestIdKey),null,2) }}" lay-verify="required" placeholder="" class="layui-input">
+                {{# }else{ }}
+                <textarea name="RequestIdKey" class="layui-textarea"></textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">缓存配置<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.cacheOptions !=""){}}
+                <textarea name="CacheOptions" lay-verify="required" placeholder="" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.cacheOptions),null,2) }}</textarea>
+                {{# }else{ }}
+                <textarea name="CacheOptions" class="layui-textarea"></textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">服务发现<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input name="ServiceName" value="{{ d.params.serviceName || '' }}" lay-verify="required" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">负载均衡<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea name="LoadBalancerOptions" lay-verify="required" placeholder="" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.loadBalancerOptions),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">请求安全</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea name="QoSOptions" lay-verify="required" placeholder="" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.qoSOptions),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">委托方法</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.delegatingHandlers !=""){}}
+                <textarea name="DelegatingHandlers" lay-verify="required" placeholder="" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.delegatingHandlers),null,2) }}</textarea>
+                {{# }else{ }}
+                <textarea name="DelegatingHandlers" class="layui-textarea"></textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">路由优先级</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.priority !=""){}}
+                <textarea name="Priority" lay-verify="required" placeholder="" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.priority),null,2) }}</textarea>
+                {{# }else{ }}
+                <textarea name="Priority" class="layui-textarea"></textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">是否有效</label>
+        <div class="layui-input-block">
+            <select name="Status">
+                <option value="false">无效</option>
+                <option value="true">有效</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="reroute-edit-form-submit" lay-submit="reroute-edit-form-submit">保存</button>
+    </div>
+</form>

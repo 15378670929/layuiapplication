@@ -1,0 +1,39 @@
+﻿<form id="button-edit-form" class="layui-form" lay-filter="button-edit-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">按钮名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="hidden" id="Id" name="Id" value="{{ d.params.id || ''}}" lay-verify="required" class="layui-input">
+                <input type="hidden" id="ModuleId" name="ModuleId" value="{{ d.params.moduleId || ''}}" lay-verify="required" class="layui-input">
+                <input type="text" id="name" name="Name" value="{{ d.params.name || ''}}" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="actionName" name="ActionName" value="{{ d.params.actionName || ''}}" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Icon</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="icon" name="Icon" value="{{ d.params.icon || ''}}" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">显示顺序</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="displayOrder" name="DisplayOrder" value="{{ d.params.displayOrder || ''}}" lay-verify="required|number" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="button-edit-form-submit" lay-submit="button-edit-form-submit">保存</button>
+    </div>
+</form>

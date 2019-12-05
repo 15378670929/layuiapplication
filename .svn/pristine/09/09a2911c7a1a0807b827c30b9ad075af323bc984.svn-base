@@ -1,0 +1,224 @@
+﻿<title>管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>用户中心</cite></a>
+        <a><cite>用户管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="userprofile-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="organization-search-sel" name="OrganizationId" lay-verify="" lay-filter="organization-search-filter" placeholder="请选择机构"></select>
+                </div>
+                <div class="layui-inline">
+                    <select class="sel" id="class-search-sel" name="ClassId" lay-verify="" lay-filter="" placeholder="请选择班级"></select>
+                </div>
+                <div class="layui-inline">
+                    <input type="text" name="name" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" id="name" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-userprofile" lay-submit lay-filter="userprofile-search">搜索</button>
+                    <button class="layui-btn btn-userprofile" data-type="add">手动添加</button>
+                    <button class="layui-btn btn-userprofile" data-type="import">批量导入</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="userprofile-table" lay-filter="userprofile-table"></table>
+            <script type="text/html" id="table-userprofile-btn">
+                <div class="layui-btn-group">
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </div>
+            </script>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('userprofile', layui.factory('userprofile')).use(['admin', 'userprofile', 'table', 'common', 'setter', 'layer', 'laydate', 'upload'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , upload = layui.upload
+            , common = layui.common;
+
+        form.render(null, 'userprofile-search');
+        $("#class-search-sel").append("<option value=\"\">请选择班级</option>");
+
+        //搜索
+        form.on('submit(userprofile-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('userprofile-table', {
+                where: {
+                    name: $("#name").val(),
+                    organizationId: $("#organization-search-sel").val(),
+                    classId: $("#class-search-sel").val()
+                },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+
+        var init = {
+            //机构
+            initOrganization: function (id) {
+                common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+                    $("#" + id).append("<option value=\"\">请选择机构</option>");
+                    $.each(res.result, function (index, item) {
+                        $("#" + id).append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                    });
+                    form.render("select");
+                });
+            },
+            initClass: function (id, data) {
+                common.ajax(setter.apiAddress.classes.list, "Get", "", { organizationId: data.value }, function (res) {
+                    $("#" + id).empty();
+                    $("#" + id).append("<option value=\"\">请选择班级</option>");
+                    $.each(res.result, function (index, item) {
+                        $("#" + id).append("<option value=\"" + item.id + "\">" + item.gradeName + item.className + "</option>");
+                    });
+                    form.render("select");
+                })
+            }
+        };
+        init.initOrganization("organization-search-sel");
+        form.on('select(organization-search-filter)', function (data) {
+            init.initClass("class-search-sel", data);
+        });
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['600px', '600px']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('usercenter/userprofile/add').done(function () {
+                            //机构
+                            init.initOrganization("orgId");
+                            //班级
+                            form.on('select(org-add-filter)', function (data) {
+                                init.initClass("classId", data);
+                            });
+                            laydate.render({
+                                elem: '#birthday'
+                            });
+                            form.render("radio");
+                            form.render();
+                            //监听提交
+                            form.on('submit(userprofile-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.userprofile.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        table.reload('userprofile-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            },
+            import: function () {
+                admin.popup({
+                    title: '批量导入'
+                    , area: ['600px', '660px']
+                    , resize: false
+                    , success: function (layero, indexs) {
+                        view(this.id).render('usercenter/userprofile/importuser').done(function () {
+                            $("#btn-import-user").hide();
+                            //机构下拉列表
+                            init.initOrganization("organizationId");
+                            ////获取班级
+                            //form.on('select(organization-import-filter)', function (data) {
+                            //    init.initClass("classId", data);
+                            //});
+                            //下载模板
+                            $("#downloadtemplate").attr('href', setter.apiAddress.userprofile.getimporttemplate);
+                            $("#downloadtemplate").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //下载错误数据
+                            $("#download-result-btn").attr('href', setter.apiAddress.userprofile.getimportresult);
+                            $("#download-result-btn").hide();
+                            $("#download-result-btn").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //拖拽上传
+                            upload.render({
+                                elem: '#import-user-from-xls'
+                                , url: setter.apiAddress.userprofile.uploadfile
+                                , accept: 'file'
+                                , field: "excelfile"
+                                , auto: false
+                                , bindAction: '#btn-import-user'
+                                , acceptMime: 'file/xlsx'
+                                , exts: 'xlsx'
+                                , size: 50
+                                , headers: { Authorization: "Bearer " + sessionStorage.getItem("access_token") }
+                                , before: function (obj) {
+                                    this.data = { organizationId: $("#organizationId").val(), classId: $("#classId").val() }//携带额外的数据
+                                    $("#btn-import-user-save").attr("disabled", true);
+                                    $("#btn-import-user-save").addClass("layui-btn-disabled");
+                                    layer.load();
+                                }
+                                , done: function (res, index, upload) {
+                                    layer.closeAll('loading');
+                                    $("#btn-import-user-save").attr("disabled", false);
+                                    $("#btn-import-user-save").removeClass("layui-btn-disabled");
+                                    if (res.statusCode == 205) {
+                                        var resultHtml = new Array();
+                                        resultHtml.push('<p>');
+                                        resultHtml.push(res.message);
+                                        resultHtml.push('</p>');
+                                        $("#import-user-result-msg").html("");
+                                        $("#import-user-result-msg").html(resultHtml.join(''));
+                                        $("#download-result-btn").show();
+                                        table.reload('userprofile-table');
+                                    } else if (res.statusCode == 202) {
+                                        $("#import-user-result-msg").html("");
+                                        layer.msg(res.message);
+                                    } else {
+                                        layer.close(indexs);
+                                        layer.msg(res.message);
+                                        table.reload('userprofile-table');
+                                    }
+                                }
+                                , error: function (index, upload) {
+                                    layer.closeAll('loading');
+                                    layer.msg("导入数据失败!");
+                                }
+                            });
+                            //提交导入
+                            form.on('submit(btn-import-user-save)', function (data) {
+                                if ($(".layui-upload-file").next().html() != "" && $(".layui-upload-file").next().html() != undefined) {
+                                    $("#btn-import-user").click();
+                                } else {
+                                    layer.msg("请选择文件");
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-userprofile').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

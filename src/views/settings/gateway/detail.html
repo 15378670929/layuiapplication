@@ -1,0 +1,105 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="gateway-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">网关名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" value="{{ d.params.name || '' }}" placeholder="" readonly autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">默认key</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" value="{{ d.params.requestIdKey || '' }}" placeholder="" readonly autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">根地址</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" value="{{ d.params.baseUrl || '' }}" placeholder="" readonly autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游架构</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.downstreamScheme==''){}}
+                <input type="text" value="未配置" placeholder="" readonly autocomplete="off" class="layui-input">
+                {{# }else{ }}
+                <textarea class="layui-textarea" readonly>{{ JSON.stringify(JSON.parse(d.params.downstreamScheme),null,2) }}</textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">服务发现</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.serviceDiscoveryProvider==''){}}
+                <input type="text" value="未配置" placeholder="" readonly autocomplete="off" class="layui-input">
+                {{# }else{ }}
+                <textarea class="layui-textarea" readonly>{{ JSON.stringify(JSON.parse(d.params.serviceDiscoveryProvider),null,2) }}</textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">负载均衡</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.loadBalancerOptions==''){}}
+                <input type="text" value="未配置" placeholder="" readonly autocomplete="off" class="layui-input">
+                {{# }else{ }}
+                <textarea class="layui-textarea" readonly>{{ JSON.stringify(JSON.parse(d.params.loadBalancerOptions),null,2) }}</textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">Http</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.httpHandlerOptions==''){}}
+                <input type="text" value="未配置" placeholder="" readonly autocomplete="off" class="layui-input">
+                {{# }else{ }}
+                <textarea class="layui-textarea" readonly>{{ JSON.stringify(JSON.parse(d.params.httpHandlerOptions),null,2) }}</textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">请求安全</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                {{# if(d.params.qoSOptions==''){}}
+                <input type="text" value="未配置" placeholder="" readonly autocomplete="off" class="layui-input">
+                {{# }else{ }}
+                <textarea class="layui-textarea" readonly>{{ JSON.stringify(JSON.parse(d.params.qoSOptions),null,2) }}</textarea>
+                {{# } }}
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">是否默认</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" value="{{ d.params.IsDefault === 'true' ? '是' : '否' }}" placeholder="" readonly autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">是否有效</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" value="{{ d.params.Status === 'true' ? '有效' : '无效' }}" placeholder="" readonly autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+</form>

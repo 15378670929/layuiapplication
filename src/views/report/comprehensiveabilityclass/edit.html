@@ -1,0 +1,26 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item" lay-filter="classes-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label ">综合能力类型</label>
+            <div class="layui-input-block">
+                <select class="sel" id="comprehensiveAbilityId" name="ComprehensiveAbilityId" lay-verify="required|select"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">划分标准</label>
+            <div class="layui-input-block ">
+                <script type="text/html" template>
+                    <input type="text" id="criteria" name="Criteria" value="{{ d.params.criteria || '' }}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                    <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="comprehensiveabilityclass-edit-form-submit">保存</button>
+        </div>
+    </div>
+</form>

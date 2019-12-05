@@ -1,0 +1,92 @@
+﻿/**
+ @Name：系统模块按钮管理
+ */
+layui.define(['form', 'common', 'setter', 'table', 'element'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , element = layui.element
+        , form = layui.form;
+
+    //按钮列表
+    table.render({
+        elem: '#sysmodule-buttons-table'
+        , url: setter.apiAddress.modulebuttons.list
+        , cols: [[
+            { field: 'name', title: '名称' },
+            { field: 'actionName', title: '权限' },
+            {
+                field: 'icon', title: 'Icon', align: 'center', width: 100,
+                templet: function (d) { return '<i class="layui-icon ' + d.icon + '"></i>'; }
+            },
+            { field: 'displayOrder', title: '显示顺序', align: 'center', width: 100 },
+            {
+                width: 150, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>');
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , where: { moduleId: layui.router().search.module }
+        , page: false
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "data": res.data
+            };
+        }
+    });
+
+    //监听按钮表格事件
+    table.on('tool(sysmodule-buttons-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'del') {
+            layer.confirm('确定删除？', function (index) {
+                common.ajax(setter.apiAddress.modulebuttons.delete, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layui.table.reload('sysmodule-buttons-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑'
+                , area: ['50%', '40%']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('settings/sysmodules/editbutton', data).done(function () {
+                        form.render();
+                        form.on('submit(button-edit-form-submit)', function (data) {
+                            common.ajax(setter.apiAddress.modulebuttons.update, "POST", "", $('#button-edit-form').serialize(), function (res) {
+                                if (res.statusCode == 200) {
+                                    layer.close(index);
+                                    layui.table.reload('sysmodule-buttons-table');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    });
+
+    exports('sysmodulebuttons', {})
+});

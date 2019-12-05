@@ -1,0 +1,59 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="course-add-form" lay-filter="course-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">课时</label>
+        <div class="layui-input-block ">
+            <input type="hidden" id="courseId" name="CourseId" lay-verify="required" class="layui-input">
+            <script type="text/html" template>
+                <input type="text" id="Name" name="Name" value="{{ d.params.name || '' }}" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+                <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">版本</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="Version" name="Version" value="{{ d.params.version || '' }}" lay-verify="required|versions" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="Version" name="DisplayOrder" value="{{ d.params.displayOrder || '' }}" lay-verify="required|positive" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <select class="sel" id="courseClass" name="CourseClass" lay-filter="" lay-verify="required|select">
+                <option value="0">请选择课程类型</option>
+                <option value="1">测评课程</option>
+                <option value="2">训练课程</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="remark" name="Remark" lay-verify="required" value="{{ d.params.remark || '' }}" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Status" value="true" title="启用">
+            <input type="radio" name="Status" value="false" title="禁用">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="childrencourse-edit-form-submit" lay-submit="childrencourse-edit-form-submit">保存</button>
+    </div>
+</form>

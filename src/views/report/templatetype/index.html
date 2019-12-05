@@ -1,0 +1,66 @@
+﻿<title>模板类型</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a><cite>报告模板类型</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="templatetype-search">
+            <button class="layui-btn btn-templatetype" data-type="add">添加</button>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="templatetype-table" lay-filter="templatetype-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('templatetype', layui.factory('templatetype')).use(['admin', 'templatetype', 'form', 'table', 'common', 'setter', 'layer', 'laydate', 'verification'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render();
+
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['30%', '35%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('report/templatetype/add').done(function () {
+                            form.render();
+                            //监听提交
+                            form.on('submit(templatetype-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.templatetype.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        table.reload('templatetype-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.btn-templatetype').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

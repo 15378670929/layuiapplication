@@ -1,0 +1,41 @@
+﻿<title>测评游戏管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a><cite>测评游戏</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="evaluationgame-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="atp" name="" lay-filter="topfilter"></select>
+                    <input type="hidden" id="province" name="Province" lay-verify="" autocomplete="off" placeholder="" class="layui-input">
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="fad" name="" lay-filter="firstfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="sad" placeholder="请选择二级能力"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-evaluationgame" lay-submit lay-filter="evaluationgame-search">搜索</button>
+                    <button class="layui-btn btn-evaluationgame" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="evaluationgame-table" lay-filter="evaluationgame-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('evaluationgame', layui.factory('evaluationgame')).use(['evaluationgame'], function () {
+    });
+</script>

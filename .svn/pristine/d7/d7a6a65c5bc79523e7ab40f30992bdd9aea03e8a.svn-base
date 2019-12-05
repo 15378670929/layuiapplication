@@ -1,0 +1,60 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="organization-add-form" lay-filter="organization-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">机构名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="" name="Name" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择省份</label>
+        <div class="layui-input-block">
+            <select class="sel" id="provinceAddId" name="ProvinceId" lay-verify="required|select" lay-filter="provincefilter"></select>
+            <input type="hidden" id="province" name="Province" lay-verify="" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择城市</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="cityAddId" name="CityId" lay-verify="required|select" lay-filter="cityfilter"></select>
+            <input type="hidden" id="city" name="City" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择地区</label>
+        <div class="layui-input-block">
+            <select class="sel" id="districtAddId" name="DistrictId" lay-verify="required|select" lay-filter="districtfilter"></select>
+            <input type="hidden" id="district" name="District" lay-verify="" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">联系地址</label>
+        <div class="layui-input-block">
+            <input type="text" id="address" name="Address" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">负责人</label>
+        <div class="layui-input-block">
+            <input type="text" id="officer" name="Officer" maxlength="10" lay-verify="required|chineselength" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">联系电话</label>
+        <div class="layui-input-block">
+            <input type="text" id="officerPhone" name="OfficerPhone" maxlength="11" lay-verify="required|phone" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Status" value="false" title="禁用">
+            <input type="radio" name="Status" value="true" title="启用" checked>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="organization-form-submit" lay-submit="organization-form-submit">保存</button>
+    </div>
+</form>

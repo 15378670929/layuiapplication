@@ -1,0 +1,68 @@
+﻿<title>API资源管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a><cite>API资源管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="oraganization-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button class="layui-btn btn-apiresource" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="apiresource-table" lay-filter="apiresource-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('apiresource', layui.factory('apiresource')).use(['admin', 'apiresource', 'table', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form
+            , common = layui.common;
+
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加受保护的API资源'
+                    , area: ['600px', '310px']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('settings/apiresource/add').done(function () {
+                            form.on('submit(apiresource-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.apiresource.addapiresource, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        layui.table.reload('apiresource-table');
+                                    }
+                                    layer.msg(res.message);
+                                }, function (error) {
+                                    layer.msg(error.msg);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.btn-apiresource').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>

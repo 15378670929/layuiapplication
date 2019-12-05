@@ -1,0 +1,76 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="organization-edit-form" lay-filter="organization-edit-form">
+    <div class="layui-form-item">
+        <div class="layui-row layui-col-space15">
+            <div class="layui-form-item">
+                <label class="layui-form-label">机构名称</label>
+                <div class="layui-input-block">
+                    <script type="text/html" template>
+                        <input type="text" name="Name" value="{{ d.params.name || '' }}" lay-verify="required|normallength" placeholder="" maxlength="30" autocomplete="off" class="layui-input">
+                        <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">省份</label>
+            <div class="layui-input-block">
+                <select class="sel" id="provinceEditId" name="ProvinceId" lay-verify="required|select" lay-filter="provincefilter"></select>
+                <input type="hidden" id="province" name="Province" lay-verify="" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">城市</label>
+            <div class="layui-input-block">
+                <select class="sel" id="cityEditId" name="CityId" lay-verify="required|select" lay-filter="cityfilter"></select>
+                <input type="hidden" id="city" name="City" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">地区</label>
+            <div class="layui-input-block">
+                <select class="sel" id="districtEditId" name="DistrictId" lay-verify="required|select" lay-filter="districtfilter"></select>
+                <input type="hidden" id="district" name="District" lay-verify="" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系地址</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="Address" value="{{ d.params.address || '' }}" maxlength="30" placeholder="" lay-verify="required|normallength" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">负责人</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="Officer" value="{{ d.params.officer || '' }}" maxlength="10" placeholder="" lay-verify="required|chineselength" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">联系电话</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="OfficerPhone" value="{{ d.params.officerPhone || '' }}" maxlength="11" placeholder="" lay-verify="required|phone" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label lines">状态</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="radio" name="status" lay-filter="status" value="false" title="禁用">
+                    <input type="radio" name="status" lay-filter="status" value="true" title="启用">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="organization-form-submit">保存</button>
+        </div>
+    </div>
+</form>

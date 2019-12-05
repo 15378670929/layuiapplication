@@ -1,0 +1,105 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="normal-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="1">常模列表</li>
+        <li>导入常模</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <!--常模列表-->
+        <div class="layui-tab-item layui-show">
+            <div class="layui-card-body">
+                <table class="layui-table" id="normal-table" lay-filter="normal-table"></table>
+                <a href='#' id="rowexport"></a>
+            </div>
+        </div>
+        <!--导入常模-->
+        <div class="layui-tab-item">
+            <div class="layui-card-body">
+                <form class="layui-form" id="import-norm-form" lay-filter="import-norm-form">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">游戏名称</label>
+                        <div class="layui-input-block ">
+                            <script type="text/html" template>
+                                <input type="hidden" id="exerciseId" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                                <input type="text" id="exercisename" readonly="readonly" name="Name" value="{{ d.params.name || '' }}" maxlength="10" lay-verify="required|normallength" class="layui-input">
+                            </script>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">国家信息</label>
+                        <div class="layui-input-block">
+                            <select class="sel" id="countryId" lay-verify="required|select" name="CountryId" lay-filter="countryfilter"></select>
+                            <input type="hidden" id="country" name="Country" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">省份信息</label>
+                        <div class="layui-input-block">
+                            <select class="sel" id="provinceId" name="ProvinceId" lay-filter="provincefilter"></select>
+                            <input type="hidden" id="pname" name="Province" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">城市信息</label>
+                        <div class="layui-input-block">
+                            <select class="sel" id="cityId" name="CityId" lay-filter="cityfilter"></select>
+                            <input type="hidden" id="city" name="City" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">地区信息</label>
+                        <div class="layui-input-block">
+                            <select class="sel" id="districtId" name="DistrictId" lay-filter="districtfilter"></select>
+                            <input type="hidden" id="district" name="District" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">设备信息</label>
+                        <div class="layui-input-block ">
+                            <select class="sel" id="deviceType" lay-verify="required|select" name="DeviceType">
+                                <option value="">请选择设备</option>
+                                <option value="1">键盘</option>
+                                <option value="2">鼠标</option>
+                                <option value="3">混合</option>
+                                <option value="4">触摸屏</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">默认常模</label>
+                        <input type="checkbox" id="op" checked="checked" name="open" lay-skin="switch" lay-filter="switchTest" lay-text="ON|OFF">
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">常模导入</label>
+                        <div class="layui-input-block import">
+                            <div class="layui-upload-drag block-display" id="import-norm-from-xls">
+                                <i class="layui-icon"></i>
+                                <p>点击上传文件，或将文件拖拽到此处</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" id="btn-import"></button>
+                        <button type="button" class="layui-btn" lay-submit="" id="btn-import-save" lay-filter="btn-import-save">导入数据</button>
+                    </div>
+                    <div class="layui-form-item">
+                        <hr class="layui-bg-green">
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <a href="#" id="downloadtemplate">
+                            点击这里下载数据模板
+                        </a>
+                    </div>
+                    <div class="layui-form-item content-center" id="importresult"></div>
+                    <div class="layui-form-item content-center">
+                        <a href="#" class="layui-btn-warm" id="downloadresult">点击这里下载错误数据</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,30 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="coursecode-add-form" lay-filter="coursecode-add-form">
+    <script type="text/html" template>
+        <div class="layui-form-item">
+            <label class="layui-form-label">课程码</label>
+            <div class="layui-input-block" style="display:flex">
+                <input type="text" id="code" name="Code" readonly="readonly" lay-verify="required" maxlength="30" autocomplete="off" class="layui-input">
+                <input type="hidden" id="beforecode" name="BeforeCode" readonly="readonly" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+                <button type="button" class="layui-btn" id="coursecode" lay-filter="">生成课程码</button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">过期时间</label>
+            <div class="layui-input-block ">
+                <input type="text" id="expirationDate" name="ExpirationDate" readonly="readonly" lay-verify="required|nowdatetiem" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block ">
+                <input type="text" id="effectiveDate" name="EffectiveDate" readonly="readonly" lay-verify="" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button type="button" id="course-save" class="layui-btn" lay-filter="coursecode-add" lay-submit="coursecode-add">保存</button>
+        </div>
+    </script>
+</form>

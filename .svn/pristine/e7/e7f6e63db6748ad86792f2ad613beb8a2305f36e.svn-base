@@ -1,0 +1,226 @@
+﻿<title>课时管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>项目中心</cite></a>
+        <a href="#/projectcenter/projects/index"><cite>项目管理</cite></a>
+        <a><cite>课程配置</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-tab layui-tab-brief" lay-filter="course-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this" lay-id="0">已选课程</li>
+                <li lay-id="1">待选课程</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!--课程明细-->
+                <div class="layui-tab-item layui-show">
+                    <button type="button" class="layui-btn btn-courseconfiggroup" data-type="coursedels">批量删除</button>
+                    <table class="layui-table" id="course_config-table" lay-filter="course_config-table"></table>
+                </div>
+                <!--课程配置-->
+                <div class="layui-tab-item">
+                    <button type="button" class="layui-btn btn-coursesave" data-type="coursesave">批量添加</button>
+                    <table class="layui-table" id="course-table" lay-filter="course-table"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use('projects', layui.factory('projects')).use(['admin', 'table', 'element', 'laypage', 'projects', 'common', 'setter', 'layer', 'form'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , layer = layui.layer
+            , setter = layui.setter
+            , table = layui.table
+            , form = layui.form
+            , element = layui.element
+            , common = layui.common;
+
+        //渲染课程列表
+        table.render({
+            elem: '#course_config-table'
+            , id: 'courseconfigId'
+            , url: setter.apiAddress.projectcourseconfig.list
+            , cols: [[
+                { type: 'checkbox' },
+                {
+                    field: 'name', title: '名称', templet: function (d) {
+                        if (d.courseDto != null) {
+                            return d.courseDto.name
+                        } else {
+                            return ""
+                        }
+                    }
+                },
+                {
+                    field: 'remark', title: '备注', templet: function (d) {
+                        if (d.courseDto != null) {
+                            return d.courseDto.remark
+                        } else {
+                            return ""
+                        }
+                    }
+                },
+                {
+                    field: 'version', title: '版本', width: 100, align: 'center', templet: function (d) {
+                        if (d.courseDto != null) {
+                            return d.courseDto.version
+                        } else {
+                            return ""
+                        }
+                    }
+                },
+                {
+                    field: 'status', title: '状态', align: 'center', width: 100,
+                    templet: function (d) {
+                        if (d.courseDto != null) {
+                            return d.courseDto.status == 1 ? '<span style="color:#009688;">启用</span>' : '<span style="color:#FF5722;">禁用</span>';
+                        }
+                    }
+                },
+                {
+                    width: 100, title: '操作', align: 'center'
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="configdel"><i class="layui-icon layui-icon-delete"></i>删除</a>');
+                        htmlButton.push('</div>')
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: {
+                curr: 0
+            }
+            , where: {
+                projectId: layui.router().search.projectid,
+                organizationId: layui.router().search.orgid
+            }
+            , text: {
+                none: '暂无相关数据'
+            }
+            , height: 'full-320'
+            , response: {
+                statusCode: 200
+            }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.result.totalCount,
+                    "data": res.result.items
+                };
+            }
+        });
+
+        var models = [];
+        //批量删除
+        $('.layui-btn.btn-courseconfiggroup').on('click', function () {
+            var checkStatus = table.checkStatus('courseconfigId');
+            if (checkStatus.data.length > 0) {
+                layer.confirm('一共选择' + checkStatus.data.length + '个课程，确定删除？', function (index) {
+                    var models = [];
+                    var coursedata = checkStatus.data;
+                    for (var i = 0; i < coursedata.length; i++) {
+                        models.push({ Id: coursedata[i].id, ProjectId: coursedata[i].projectId, CourseId: coursedata[i].courseId });
+                    }
+                    common.ajax(setter.apiAddress.projectcourseconfig.delete, "POST", "", { models: models }, function (res) {
+                        if (res.statusCode == 200) {
+                            layer.close(index);
+                            table.reload('courseconfigId');
+                        }
+                        layer.msg(res.message);
+                    });
+                });
+            } else {
+                layer.msg("请选择课程");
+            }
+        });
+
+        //课程切换
+        element.on('tab(course-tab)', function (data) {
+            if (data.index == 1) {
+                //渲染课程列表
+                table.render({
+                    elem: '#course-table'
+                    , id: 'courseId'
+                    , url: setter.apiAddress.course.pagelist
+                    , cols: [[
+                        { type: 'checkbox' },
+                        { field: 'name', title: '名称' },
+                        { field: 'remark', title: '备注' },
+                        { field: 'version', title: '版本', width: 100, align: 'center' }
+                    ]]
+                    , where: { projectId: layui.router().search.projectid }
+                    , page: true
+                    , text: {
+                        none: '暂无相关数据'
+                    }
+                    , height: 'full-320'
+                    , cellMinWidth: 130
+                    , response: {
+                        statusCode: 200
+                    }
+                    , parseData: function (res) {
+                        return {
+                            "code": res.statusCode,
+                            "msg": res.message,
+                            "count": res.result.totalCount,
+                            "data": res.result.items
+                        };
+                    }
+                });
+                $('.layui-btn.btn-coursesave').on('click', function () {
+                    var checkStatus = table.checkStatus('courseId');
+                    if (checkStatus.data.length > 0) {
+                        layer.confirm('一共选择' + checkStatus.data.length + '个课程，确定添加？', function (index) {
+                            var models = [];
+                            var coursedata = checkStatus.data;
+                            for (var i = 0; i < coursedata.length; i++) {
+                                models.push({ ProjectId: layui.router().search.projectid, CourseId: coursedata[i].id, OrganizationId: layui.router().search.orgid });
+                            }
+                            common.ajax(setter.apiAddress.projectcourseconfig.add, "POST", "", { models: models }, function (res) {
+                                if (res.statusCode == 200) {
+                                    element.tabChange('course-tab', '0');
+                                    table.reload('courseconfigId');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    } else {
+                        layer.msg("请选择课程");
+                    }
+                });
+            }
+        });
+
+        var models = [];
+        //所选课程列表操作
+        table.on('tool(course_config-table)', function (obj) {
+            var rowcouserdata = obj.data;
+            if (obj.event === 'configdel') {
+                layer.confirm('确定删除？', function (index) {
+                    if (rowcouserdata.id != "") {
+                        models.push({ Id: rowcouserdata.id, ProjectId: rowcouserdata.projectId, CourseId: rowcouserdata.courseId });
+                        common.ajax(setter.apiAddress.projectcourseconfig.delete, "POST", "", { models: models }, function (res) {
+                            if (res.statusCode == 200) {
+                                layer.close(index);
+                                table.reload('courseconfigId');
+                            }
+                            layer.msg(res.message);
+                        });
+                    } else { layer.msg("删除数据异常"); }
+                });
+            }
+        });
+    });
+</script>
+

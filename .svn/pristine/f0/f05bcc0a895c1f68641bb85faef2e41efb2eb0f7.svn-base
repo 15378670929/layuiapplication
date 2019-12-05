@@ -1,0 +1,64 @@
+﻿<title>服务管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a><cite>服务管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button class="layui-btn btn-client" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="client-table" lay-filter="client-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('clients', layui.factory('clients')).use(['admin', 'clients', 'table', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form
+            , common = layui.common;
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加服务信息'
+                    , area: ['600px', '320px']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('settings/clients/add').done(function () {
+                            form.on('submit(client-form-submit)', function (data) {
+                                var submitdata = $('#client-add-form').serialize();
+                                common.ajax(setter.apiAddress.client.add, "POST", "", submitdata, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        layui.table.reload('client-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-client').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

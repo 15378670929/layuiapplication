@@ -1,0 +1,42 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="import-user-form" lay-filter="import-user-form">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>数据模板下载</legend>
+    </fieldset>
+    <div class="layui-form-item content-center">
+        <a href="#" id="downloadtemplate">
+            点击这里下载数据模板
+        </a>
+    </div>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>批量导入用户</legend>
+    </fieldset>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择机构</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="organizationId" name="OrganizationId" lay-verify="required|select" lay-filter="organization-import-filter" placeholder="请选择机构"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">数据上传</label>
+        <div class="layui-input-block">
+            <div class="layui-upload-drag block-display" id="import-user-from-xls">
+                <i class="layui-icon"></i>
+                <p>点击上传文件，或将文件拖拽到此处</p>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" id="btn-import-user"></button>
+        <button type="button" class="layui-btn" lay-submit="" id="btn-import-user-save" lay-filter="btn-import-user-save">导入数据</button>
+    </div>
+    <div class="layui-form-item">
+        <hr class="layui-bg-green">
+    </div>
+    <div class="layui-form-item content-center" id="import-user-result-msg"></div>
+    <div class="layui-form-item content-center">
+        <a href='#' class="layui-btn-warm" id="download-result-btn">点击这里下载错误数据</a>
+    </div>
+</form>

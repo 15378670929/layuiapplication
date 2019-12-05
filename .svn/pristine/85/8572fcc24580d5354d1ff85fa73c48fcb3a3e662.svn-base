@@ -1,0 +1,175 @@
+﻿<title>能力参考</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a><cite>报告能力参考</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="abilityreference-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button class="layui-btn btn-abilityreference" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="abilityreference-table" lay-filter="abilityreference-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('abilityreference', layui.factory('abilityreference')).use(['admin', 'abilityreference', 'table', 'common', 'setter', 'layer', 'laydate', 'treeSelect', 'verification', 'element'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common
+            , element = layui.element
+            , treeSelect = layui.treeSelect;
+
+        form.render(null, 'abilityreference-search');
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['50%', '60%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('report/abilityreference/add').done(function () {
+                            form.render(null, 'abilityreference-form');
+                            form.render('select');
+                            initTree('');
+                            //能力分级事件
+                            common.ajax(setter.apiAddress.abilityclass.loadall, "GET", "", '', function (res) {
+                                if (res.statusCode == 200) {
+                                    // 对结果进行处理
+                                    res.result.map(item => {
+                                        if (item.dataIdentification === 1) {
+                                            item.dataIdentification = '基础能力'
+                                        } else {
+                                            item.dataIdentification = '学科能力'
+                                        }
+                                        return item
+                                    })
+                                    var items = res.result.reduce((prev, next) => {
+                                        var obj = {}
+                                        obj.id = next.id
+                                        obj.name = next.abilityName + '(' + next.dataIdentification + ')'
+                                        prev.push(obj)
+                                        return prev
+                                    }, [])
+                                    $("#ordinaryAbilityId").empty();
+                                    $("#ordinaryAbilityId").append("<option value=\"\">请选择能力分级</option>");
+                                    $.each(items, function (index, item) {
+                                        $("#ordinaryAbilityId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                    });
+                                    form.render("select");
+                                }
+                            }, function (error) {
+                                layer.msg(error.msg);
+                            });
+                            form.on('submit(abilityreference-add-form-submit)', function (data) {
+                                data.field.ComprehensiveAbilityId = ''
+                                common.ajax(setter.apiAddress.abilityreference.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layui.table.reload('abilityreference-table');
+                                        layer.close(index);
+                                    }
+                                    layer.msg(res.message);
+                                }, function (error) {
+                                    layer.msg(error.msg);
+                                });
+                            });
+
+                            // 当用户切换到综合能力
+                            element.on('tab(ability-tab)', function (data) {
+                                if (data.index == 1) {
+                                    common.ajax(setter.apiAddress.comprehensiveability.loadall, "GET", "", '', function (res) {
+                                        if (res.statusCode == 200) {
+                                            $("#comprehensiveAbilityId").empty();
+                                            $("#comprehensiveAbilityId").append("<option value=\"\">请选择能力分级</option>");
+                                            $.each(res.result, function (index, item) {
+                                                $("#comprehensiveAbilityId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                            });
+                                            form.render("select");
+                                        }
+                                    }, function (error) {
+                                        layer.msg(error.msg);
+                                    });
+                                }
+
+                                form.on('submit(abilityreference-add-form)', function (data) {
+                                    data.field.OrdinaryAbilityId = ''
+                                    data.field.AbilityId = ''
+                                    common.ajax(setter.apiAddress.abilityreference.add, "POST", "", data.field, function (res) {
+                                        if (res.statusCode == 200) {
+                                            layui.table.reload('abilityreference-table');
+                                            layer.close(index);
+                                        }
+                                        layer.msg(res.message);
+                                    }, function (error) {
+                                        layer.msg(error.msg);
+                                    });
+                                });
+                            })
+                        });
+                    }
+                });
+            }
+        };
+
+        function initTree(nodeId) {
+            treeSelect.render({
+                elem: '#abilityreference-tree',
+                url: setter.apiAddress.ability.seltree,
+                type: 'get',
+                placeholder: '请选择',
+                style: {
+                    folder: {
+                        enable: true
+                    },
+                    line: {
+                        enable: true
+                    }
+                },
+                search: true,
+                click: function (data) {
+                    $("#abilityId").val(data.current.id);
+                    $("#abilityreference-tree").val(data.current.name);
+                },
+                success: function (data) {
+                    $('div.layui-treeSelect input.layui-unselect').attr("lay-verify","required")
+                    treeObj = treeSelect.zTree('abilityreference-tree');
+                    var defaultNode = { id: "00000000-0000-0000-0000-000000000000", name: "添加能力维度" };
+                    treeObj.addNodes(null, 0, defaultNode);
+                    if (nodeId != "") {
+                        var node = treeObj.getNodeByParam('id', nodeId);
+                        treeObj.selectNode(node, true);
+                        treeObj.checkNode(node, true, true);
+                        $(".layui-unselect").val(node.name);
+                    }
+
+                }
+            });
+        }
+
+        $('.layui-btn.btn-abilityreference').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>

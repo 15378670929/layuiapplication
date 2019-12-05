@@ -1,0 +1,23 @@
+﻿<form class="layui-form" id="apiresource-add-form" lay-filter="apiresource-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">资源名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="name" name="name" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">显示名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="displayName" name="displayName" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">资源描述</label>
+        <div class="layui-input-block">
+            <input type="text" id="description" name="description" lay-verify="required|describelength" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="apiresource-form-submit" lay-submit="client-form-submit">保存</button>
+    </div>
+</form>

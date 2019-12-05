@@ -1,0 +1,163 @@
+﻿<title>机构管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>用户中心</cite></a>
+        <a><cite>机构管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="oraganization-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="provinceId" lay-filter="aprovincefilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="cityId" lay-filter="acityfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="districtId" lay-filter="districtfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <input type="text" name="name" id="name" placeholder="请输入机构名称" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-organization" lay-submit lay-filter="organization-search">搜索</button>
+                    <button class="layui-btn btn-organization" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="organization-table" lay-filter="organization-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('organization', layui.factory('organization')).use(['admin', 'organization', 'table', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form;
+        var common = layui.common;
+
+        $("#cityId").append("<option value=\"\">请选择城市</option>");
+        $("#districtId").append("<option value=\"\">请选择地区</option>");
+
+        //搜索
+        form.on('submit(organization-search)', function (data) {
+            //执行重载
+            table.reload('organization-table', {
+                where: {
+                    name: $("#name").val(),
+                    provinceId: $("#provinceId").val(),
+                    cityId: $("#cityId").val(),
+                    districtId: $("#districtId").val()
+                },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+
+        //获取省份
+        common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: 1 }, function (res) {
+            $("#provinceId").append("<option value=\"\">请选择省份</option>");
+            $.each(res.data, function (index, item) {
+                $("#provinceId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+            });
+            form.render("select");
+        });
+        //获取城市
+        form.on('select(aprovincefilter)', function (data) {
+            $("#cityId").empty();
+            $("#districtId").empty();
+            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                $("#cityId").append("<option value=\"\">请选择城市</option>");
+                $("#districtId").append("<option value=\"\">请选择地区</option>");
+                $.each(res.data, function (index, item) {
+                    $("#cityId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                });
+                form.render("select");
+            })
+        });
+        //获取地区
+        form.on('select(acityfilter)', function (data) {
+            $("#districtId").empty();
+            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                $("#districtId").append("<option value=\"\">请选择地区</option>");
+                $.each(res.data, function (index, item) {
+                    $("#districtId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                });
+                form.render("select");
+            })
+        });
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['500px', '600px']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('usercenter/organization/add').done(function () {
+                            form.render(null, "organization-add-form");
+                            //省份
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: 1 }, function (res) {
+                                common.select("provinceAddId", res.data, "", 1);
+                                form.render("select");
+                            });
+                            //城市
+                            form.on('select(provincefilter)', function (data) {
+                                $("#province").val($("#provinceAddId").find("option:selected").text());
+                                $("#cityAddId").empty();
+                                $("#city").val("");
+                                $("#districtAddId").empty();
+                                $("#district").val("");
+                                common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                    common.select("cityAddId", res.data, "", 1);
+                                    form.render("select");
+                                })
+                            });
+                            //地区
+                            form.on('select(cityfilter)', function (data) {
+                                $("#city").val($("#cityAddId").find("option:selected").text());
+                                $("#districtAddId").empty();
+                                $("#district").val("");
+                                common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                    common.select("districtAddId", res.data, "", 1);
+                                    form.render("select");
+                                })
+                            });
+                            //获取地区文本
+                            form.on('select(districtfilter)', function (data) {
+                                $("#district").val($("#districtAddId").find("option:selected").text());
+                            });
+                            //监听提交
+                            form.on('submit(organization-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.organization.add, "POST", "", $('#organization-add-form').serialize(), function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        layui.table.reload('organization-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-organization').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

@@ -1,0 +1,82 @@
+﻿<title>综合能力类型</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a><cite>综合能力类型</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="comprehensiveability-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button class="layui-btn btn-comprehensiveability" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="comprehensiveability-table" lay-filter="comprehensiveability-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('comprehensiveability', layui.factory('comprehensiveability')).use(['admin', 'comprehensiveability', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render(null, 'comprehensiveability-search');
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['30%', '35%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('report/comprehensiveability/add').done(function () {
+                            form.render(null, 'comprehensiveability-form');
+                            form.render('radio');
+                            //时间选择器
+                            laydate.render({
+                                elem: '#createTime'
+                                , type: 'time'
+                            });
+                            form.on('submit(comprehensiveability-add-form-submit)', function (data) {
+                                data.field.DisplayOrder = parseInt(data.field.DisplayOrder)
+                                common.ajax(setter.apiAddress.comprehensiveability.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layui.table.reload('comprehensiveability-table');
+                                        layer.close(index);
+                                    }
+                                    layer.msg(res.message);
+                                }, function (error) {
+                                    layer.msg(error.msg);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.btn-comprehensiveability').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>

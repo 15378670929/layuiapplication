@@ -1,0 +1,104 @@
+﻿<form class="layui-form" id="reroute-add-form" lay-filter="reroute-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">对应网关</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="reroute-add-sel" name="GatewayId" lay-verify="required|select" placeholder="请选择网关"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上游路径<label style="color:red;">*</label></label>
+        <div class="layui-input-block ">
+            <input type="text" id="UpstreamPathTemplate" name="UpstreamPathTemplate" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上游方法<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <textarea id="UpstreamHttpMethod" name="UpstreamHttpMethod" lay-verify="required" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">上游域名</label>
+        <div class="layui-input-block">
+            <input type="text" id="UpstreamHost" name="UpstreamHost" lay-verify="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游架构<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <input type="text" id="DownstreamScheme" name="DownstreamScheme" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游路径<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <input type="text" id="DownstreamPathTemplate" name="DownstreamPathTemplate" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游地址</label>
+        <div class="layui-input-block">
+            <textarea name="DownstreamHostAndPorts" lay-verify="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">授权配置</label>
+        <div class="layui-input-block">
+            <textarea name="AuthenticationOptions" lay-verify="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">全局key</label>
+        <div class="layui-input-block">
+            <input type="text" name="RequestIdKey" lay-verify="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">缓存配置<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <textarea name="CacheOptions" lay-verify="required" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">服务发现<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <textarea name="ServiceName" lay-verify="required" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">负载均衡<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <textarea name="LoadBalancerOptions" lay-verify="required" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">请求安全<label style="color:red;">*</label></label>
+        <div class="layui-input-block">
+            <textarea name="QoSOptions" lay-verify="required" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">委托方法</label>
+        <div class="layui-input-block">
+            <textarea name="DelegatingHandlers" lay-verify="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">路由优先级</label>
+        <div class="layui-input-block">
+            <textarea name="Priority" lay-verify="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">是否有效</label>
+        <div class="layui-input-block">
+            <select name="Status">
+                <option value="false">无效</option>
+                <option value="true">有效</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="reroute-add-form-submit" lay-submit="reroute-add-form-submit">保存</button>
+    </div>
+</form>

@@ -1,0 +1,33 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="import-user-form" lay-filter="import-question-form">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>数据模板下载</legend>
+    </fieldset>
+    <div class="layui-form-item content-center">
+        <a href="#" id="download-template">
+            点击这里下载数据模板
+        </a>
+    </div>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>批量导入题目</legend>
+    </fieldset>
+    <div class="layui-form-item content-center">
+        <div class="layui-upload-drag block-display" id="import-questions-from-xls">
+            <i class="layui-icon"></i>
+            <p>点击上传文件，或将文件拖拽到此处</p>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" id="btn-import"></button>
+        <button type="button" class="layui-btn" lay-submit="" id="btn-start-import" lay-filter="btn-start-import">导入数据</button>
+    </div>
+    <div class="layui-form-item">
+        <hr class="layui-bg-green">
+    </div>
+    <div class="layui-form-item content-center" id="import-result-div"></div>
+    <div class="layui-form-item content-center">
+        <a href='#' class="layui-btn-warm" id="download-question-result">点击这里下载错误数据</a>
+    </div>
+</form>

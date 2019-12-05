@@ -1,0 +1,78 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="childcourse-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="0">课时明细</li>
+        <li lay-id="1">添加题目壳</li>
+        <li lay-id="2">添加测评游戏</li>
+        <li lay-id="3">添加训练游戏</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--课时明细-->
+        <div class="layui-tab-item layui-show">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="childcourse-config-search" style="padding-left:0;">
+                <button class="layui-btn btn-config-group" data-type="childcoursedels">批量删除</button>
+            </div>
+            <table class="layui-table" id="childcourseconfig-table" lay-filter="childcourseconfig-table"></table>
+        </div>
+        <!--题目壳信息-->
+        <div class="layui-tab-item">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="questionconfig-search" style="padding-left:0;">
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <select class="sel" id="questionability" name="" lay-filter="topfilter"></select>
+                        <input type="hidden" id="province" name="Province" lay-verify="" autocomplete="off" placeholder="" class="layui-input">
+                    </div>
+                    <div class="layui-input-inline">
+                        <select class="sel" id="questionfirstabilitty" name="" lay-filter="firstfilter"></select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select class="sel" id="questionsecondability"></select>
+                    </div>
+                    <button class="layui-btn btn-questiongroup" lay-submit lay-filter="questiongroup-search">搜索</button>
+                    <button class="layui-btn btn-questions-group" data-type="questionconfig">批量添加</button>
+                </div>
+            </div>
+            <table class="layui-table" id="questions-group-table" lay-filter="questions-group-table"></table>
+        </div>
+        <!--测试游戏-->
+        <div class="layui-tab-item">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="evaluationconfig-search" style="padding-left:0;">
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <select class="sel" id="evalutionatp" name="" lay-filter="evalutiontopfilter"></select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select class="sel" id="evalutionfad" name="" lay-filter="evalutionfirstfilter"></select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select class="sel" id="evalutionsad"></select>
+                    </div>
+                    <button class="layui-btn btn-evaluationconfig" lay-submit lay-filter="evaluationconfig-search">搜索</button>
+                    <button class="layui-btn btn-evaluationconfig-group" data-type="evaluationconfig">批量添加</button>
+                </div>
+            </div>
+            <table class="layui-table" id="evaluationgame-table" lay-filter="evaluationgame-table"></table>
+        </div>
+        <!--训练游戏-->
+        <div class="layui-tab-item">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="taingame-search" style="padding-left:0;">
+                <div class="layui-form-item">
+                    <div class="layui-input-inline">
+                        <select class="sel" id="taingameatp" name="" lay-filter="taingametopfilter"></select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select class="sel" id="taingamefad" name="" lay-filter="taingamefirstfilter"></select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <select class="sel" id="taingamesad"></select>
+                    </div>
+                    <button class="layui-btn btn-taingame" lay-submit lay-filter="taingame-search">搜索</button>
+                    <button class="layui-btn btn-traingame-group" data-type="traingameconfig">批量添加</button>
+                </div>
+            </div>
+            <table class="layui-table" id="traingame-table" lay-filter="traingame-table"></table>
+        </div>
+    </div>
+</div>

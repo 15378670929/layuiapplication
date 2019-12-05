@@ -1,0 +1,54 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item" lay-filter="classes-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="name" name="Name" value="{{ d.params.name || '' }}" lay-verify="required|normallengthThree" maxlength="15" autocomplete="off" class="layui-input">
+                    <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="version" name="Version" lay-verify="required|versions" value="{{ d.params.version || '' }}" autocomplete="off" placeholder="" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">Url</label>
+            <div class="layui-input-block ">
+                <script type="text/html" template>
+                    <input type="text" id="url" name="Url" value="{{ d.params.url || '' }}" lay-verify="required|url" autocomplete="off" placeholder="" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="Status" value="true" title="启用">
+                <input type="radio" name="Status" value="false" title="禁用">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">说明</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <textarea placeholder="" id="Describetion" name="Describetion" value="{{ d.params.describetion || '' }}" lay-verify="required" class="layui-textarea"></textarea>
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="questiongrouptemplate-form-submit">保存</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use('questiongrouptemplate');
+</script>

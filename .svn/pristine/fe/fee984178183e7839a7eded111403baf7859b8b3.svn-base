@@ -1,0 +1,29 @@
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="roles-add-form" lay-filter="roles-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择机构</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="hidden" id="organizationName" name="OrganizationName" lay-verify="" placeholder="" class="layui-input">
+                <input type="hidden" id="concurrencyStamp" name="ConcurrencyStamp" value="{{ d.params.concurrencyStamp || '' }}" lay-verify="" placeholder="" class="layui-input">
+                <input type="hidden" id="normalizedName" name="NormalizedName" value="{{ d.params.NormalizedName || '' }}" lay-verify="" placeholder="" class="layui-input">
+                <input type="hidden" id="id" name="Id" value="{{ d.params.id || '' }}" lay-verify="" placeholder="" class="layui-input">
+                <select class="sel" id="organizationId" value="{{ d.params.organizationId || '' }}" name="OrganizationId" lay-verify="required|select" lay-filter="orgfilter"></select>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" id="name" name="Name" value="{{ d.params.name || '' }}" lay-verify="required" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="roles-edit-form-submit">保存</button>
+    </div>
+</form>

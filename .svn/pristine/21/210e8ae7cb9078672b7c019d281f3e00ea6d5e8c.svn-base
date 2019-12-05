@@ -1,0 +1,157 @@
+﻿/**
+ @Name：报告中心-测评报告-项目课程信息-报告预览与下载的入口
+ */
+layui.define(['admin', 'table', 'element', 'laydate', 'common', 'setter', 'layer', 'form'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , layer = layui.layer
+        , setter = layui.setter
+        , table = layui.table
+        , element = layui.element
+        , laydate = layui.laydate
+        , form = layui.form
+        , common = layui.common;
+
+    //项目下的课程信息列表
+    table.render({
+        elem: '#course-table'
+        , url: setter.apiAddress.projectcourseconfig.list
+        , cols: [[
+            {
+                field: 'name', title: '课程名称', templet: function (d) {
+                    if (d.courseDto != null) {
+                        return d.courseDto.name
+                    }
+                    return ""
+                }
+            },
+            {
+                field: 'isFinished', title: '完成状态', align: 'center', width: 100,
+                templet: function (d) {
+                    return d.isFinished == 1 ? "<span style='color:#009688;'>完成</span>" : "<span style='color:#FF5722;'>未完成</span>";
+                }
+            },
+            {
+                title: '操作', align: 'center', width: 100
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="viewsubcourse"><i class="layui-icon layui-icon-align-center"></i>课时</a>');
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: {
+            curr: 0
+        }
+        , where: {
+            projectId: layui.router().search.project,
+            organizationId: layui.router().search.organization
+        }
+        , height: 'full-320'
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.result.totalCount,
+                "data": res.result.items
+            };
+        }
+        , done: function (res, curr, count) {
+            var courseId = 0;
+            if (res.data.length > 0) {
+                courseId = res.data[0].courseId
+            }
+            initSubCourse(layui.router().search.project, courseId)
+        }
+    });
+
+    //项目下课程的课时信息列表
+    function initSubCourse(projectId, courseId) {
+        table.render({
+            elem: '#subcourse-table'
+            , url: setter.apiAddress.projectcoursedetail.list
+            , cols: [[
+                {
+                    field: 'name', title: '课时名称', templet: function (d) {
+                        if (d.courseChildDto != null) {
+                            return d.courseChildDto.name
+                        }
+                        return ""
+                    }
+                },
+                {
+                    field: 'isFinished', title: '完成状态', align: 'center', width: 100,
+                    templet: function (d) {
+                        return d.isFinished == 1 ? "<span style='color:#009688;'>完成</span>" : "<span style='color:#FF5722;'>未完成</span>";
+                    }
+                },
+                {
+                    width: 440, title: '操作', align: 'center'
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="viewgroupreport"><i class="layui-icon layui-icon-template-1"></i>团体报告预览</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="downloadgroupreport"><i class="layui-icon layui-icon-download-circle"></i>团体报告下载</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="downloadpersonalreports"><i class="layui-icon layui-icon-download-circle"></i>报告批量下载</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="personalreport"><i class="layui-icon layui-icon-user"></i>个人报告明细</a>');
+                        htmlButton.push('</div>')
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: true
+            , height: 'full-320'
+            , where: { projectId: projectId, courseId: courseId }
+            , text: { none: '暂无相关数据' }
+            , response: { statusCode: 200 }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.result.totalCount,
+                    "data": res.result.items
+                };
+            }
+        });
+    }
+
+    //课程事件-查看课程下的课时信息
+    table.on('tool(course-table)', function (obj) {
+        var rowcouserdata = obj.data;
+        if (obj.event === 'viewsubcourse') {
+            initSubCourse(layui.router().search.project, rowcouserdata.courseId);
+        }
+    });
+
+    //课时事件
+    table.on('tool(subcourse-table)', function (obj) {
+        var rowdata = obj.data;
+        console.log(rowdata);
+        if (obj.event === 'viewgroupreport') {
+            layer.msg("预览团队报告功能开发中");
+        } else if (obj.event === 'downloadgroupreport') {
+            layer.msg("下载团队报告功能开发中");
+        } else if (obj.event === 'downloadpersonalreports') {
+            common.ajax(setter.apiAddress.courseresultreport.checkdownload, "GET", "", { organizationId: layui.router().search.organization, projectId: layui.router().search.project, courseId: rowdata.courseId, courseChildId: rowdata.courseChildId }, function (res) {
+                if (res.statusCode === 200) {
+                    window.location.href = setter.apiAddress.courseresultreport.downloadbatch + "?organizationId=" + layui.router().search.organization + "&courseId=" + rowdata.courseId + "&projectId=" + layui.router().search.project + "&courseChildId=" + rowdata.courseChildId;
+                }
+                else {
+                    layer.msg(res.message);
+                }
+            });
+        } else if (obj.event === 'personalreport') {//转至查看或下载个人报告页面
+            location.hash = '/report/viewreports/personalreport/organization=' + layui.router().search.organization + '/project=' + layui.router().search.project + '/course=' + rowdata.courseId + '/courseChild=' + rowdata.courseChildId;
+        }
+    });
+    exports('viewreportscourses', {})
+});

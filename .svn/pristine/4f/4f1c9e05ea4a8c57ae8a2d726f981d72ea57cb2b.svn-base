@@ -1,0 +1,38 @@
+<script type="text/html" template>
+  <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="application-add-form" lay-filter="application-add-form">
+  <div class="layui-form-item">
+      <div class="layui-row layui-col-space15">
+          <div class="layui-form-item">
+              <label class="layui-form-label">应用名称</label>
+              <div class="layui-input-block">
+                  <script type="text/html" template>
+                      <input type="text" name="applicationName" value="{{ d.params.applicationName || '' }}" lay-verify="required|normallength" placeholder="" maxlength="30" autocomplete="off" class="layui-input">
+                  </script>
+              </div>
+          </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label lines">模块描述</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="DescText" name="description" value="{{ d.params.description || '' }}" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+      </div>
+      <div class="layui-form-item">
+          <label class="layui-form-label lines">状态</label>
+          <div class="layui-input-block">
+              <script type="text/html" template>
+                  <input type="radio" name="status" lay-filter="status" value="false" title="禁用">
+                  <input type="radio" name="status" lay-filter="status" value="true" title="启用">
+              </script>
+          </div>
+      </div>
+      <div class="layui-form-item content-center">
+          <button class="layui-btn" type="button" lay-submit lay-filter="application-form-submit">保存</button>
+      </div>
+  </div>
+</form>

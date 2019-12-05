@@ -1,0 +1,44 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="question-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="0">题目列表</li>
+        <li lay-id="1">题目配置</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <!--题目列表-->
+        <div class="layui-tab-item layui-show">
+            <div class="layui-card-body">
+                <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="questions-group-search">
+                    <button class="layui-btn btn-config-group" data-type="questiondels">批量删除</button>
+                </div>
+                <table class="layui-table" id="questionconfig-table" lay-filter="questionconfig-table"></table>
+            </div>
+        </div>
+        <!--题目配置-->
+        <div class="layui-tab-item">
+            <div class="layui-card-body">
+                <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="questions-group-search">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">能力</label>
+                        <div class="layui-input-inline">
+                            <select class="sel" id="atp" name="" lay-filter="topfilter"></select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select class="sel" id="fad" name="" lay-filter="firstfilter"></select>
+                        </div>
+                        <div class="layui-input-inline">
+                            <select class="sel" id="sad"></select>
+                        </div>
+                        <button class="layui-btn btn-questions" lay-submit lay-filter="questions-group-search">搜索</button>
+                        <button class="layui-btn btn-questions-group" data-type="questionconfig">批量添加</button>
+                    </div>
+                </div>
+                <table class="layui-table" id="questions-table" lay-filter="questions-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,31 @@
+﻿<title>系统模块管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a><cite>系统模块管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="dicability-search">
+            <div class="layui-form-item">
+                <button id="btn-add-applicationtemplate" class="layui-btn">添加</button>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="applicationtemplate-table" lay-filter="applicationtemplate-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('applicationtemplate', layui.factory('applicationtemplate')).use(['applicationtemplate'], function () {
+
+    });
+</script>

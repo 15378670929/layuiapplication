@@ -1,0 +1,55 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="classes-add-form" lay-filter="classes-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择机构</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="orgId" name="OrgId" lay-verify="required|select" lay-filter="orgfilter"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">年级名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="gradename" name="GradeName" lay-verify="required" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">班级名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="classname" name="ClassName" lay-verify="required" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">班级类型</label>
+        <div class="layui-input-block">
+            <select name="ClassesType" lay-verify="required|select">
+                <option value="">请选择</option>
+                <option value="1">行政班</option>
+                <option value="2">教学班</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">入学年份</label>
+        <div class="layui-input-block">
+            <input type="text" readonly="readonly" class="layui-input" id="startschoolyear" name="StartSchoolYear" lay-verify="required|nowyear">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">负责老师</label>
+        <div class="layui-input-block">
+            <input type="text" id="teacher" name="Teacher" lay-verify="required|chineselength" maxlength="10" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">联系电话</label>
+        <div class="layui-input-block">
+            <input type="text" id="phone" name="Phone" lay-verify="required|phone" maxlength="11" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="classes-form-submit">保存</button>
+    </div>
+</form>

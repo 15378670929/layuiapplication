@@ -1,0 +1,114 @@
+﻿<title>系统用户管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a><cite>系统用户</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="adminuser-search">
+            <div class="layui-input-inline">
+                <select class="sel" id="organization" name="organizationId" lay-filter="organizationfilter"></select>
+            </div>
+            <div class="layui-inline">
+                <input type="text" name="userAccount" id="userAccount" placeholder="请输入账号" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-inline">
+                <input type="text" name="phoneNumber" id="phoneNumber" placeholder="请输入手机" autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-inline">
+                <button class="layui-btn btn-adminuser" lay-submit lay-filter="adminuser-search">搜索</button>
+                <button class="layui-btn btn-adminuser" data-type="add">添加</button>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="adminuser-table" lay-filter="adminuser-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('adminuser', layui.factory('adminuser')).use(['admin', 'adminuser', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render();
+
+        //搜索
+        form.on('submit(adminuser-search)', function (data) {
+            //执行重载
+            table.reload('adminuser-table', {
+                where: data.field
+            });
+        });
+
+        //获取机构
+        common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+            $("#organization").append("<option value=''>请选择机构</option>");
+            $.each(res.result, function (index, item) {
+                $("#organization").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+            });
+            form.render("select");
+        });
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['50%', '60%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('settings/adminuser/add').done(function () {
+                            //初始化添加页面机构列表
+                            common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+                                $("#OrganizationId").append("<option value=''>请选择机构</option>");
+                                $.each(res.result, function (index, item) {
+                                    $("#OrganizationId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                });
+                                form.render();
+                            });
+                            form.render();
+                            //初始化添加页面角色列表
+                            form.on('select(add-user-organization-filter)', function (data) {
+                                $("#RoleId").empty();
+                                $("#RoleId").append("<option value=\"\">请选择角色</option>");
+                                common.ajax(setter.apiAddress.roles.list, "Get", "", { organizationId: data.value }, function (res) {
+                                    $.each(res.result, function (index, item) {
+                                        $("#RoleId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                    });
+                                    form.render();
+                                });
+                            });
+                            form.on('submit(adminuser-add-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.adminuser.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layui.table.reload('adminuser-table');
+                                        layer.close(index);
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-adminuser').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

@@ -1,0 +1,151 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="questiongroup-edit-form" lay-filter="questiongroup-edit-form">
+    <script type="text/html" template>
+        <div class="layui-form-item">
+            <label class="layui-form-label">题目壳名称</label>
+            <div class="layui-input-block ">
+                <input type="hidden" id="" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                <input type="text" id="Name" name="Name" value="{{ d.params.name || '' }}" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">选择模板</label>
+                <div class="layui-input-inline">
+                    <select id="grouptemplateId" name="GrouptemplateId" lay-verify="required|select"></select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">完成方式</label>
+                <div class="layui-input-inline">
+                    <select id="finishType" name="FinishType" lay-verify="required|select">
+                        <option value="-1">请选择</option>
+                        <option value="1">不限时</option>
+                        <option value="2">限时</option>
+                        <option value="3">随时提交</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">算分码</label>
+                <div class="layui-input-inline">
+                    <select class="sel" id="code" name="" lay-verify="required|select" lay-filter="codefilter">
+                        <option value="">请选择</option>
+                    </select>
+                    <input type="hidden" id="calculateBeforeCode" value="{{ d.params.exerciseCalculateCode || '' }}" name="BeforeCode" lay-verify="" class="layui-input">
+                    <input type="hidden" id="calculateCode" value="{{ d.params.exerciseCalculateCode || '' }}" name="ExerciseCalculateCode" lay-verify="required" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">科学名称</label>
+            <div class="layui-input-block ">
+                <input type="text" id="scientificName" name="ScientificName" value="{{ d.params.scientificName || '' }}" lay-verify="required|username" maxlength="100" autocomplete="off" placeholder="" class="layui-input" />
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本</label>
+            <div class="layui-input-block ">
+                <input type="text" id="Version" name="Version" value="{{ d.params.version || '' }}" lay-verify="required|versions" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">年龄范围</label>
+            <div class="layui-input-inline ">
+                <input type="text" id="minAge" name="MinAge" value="{{ d.params.minAge || '' }}" lay-verify="required|number|age|positive" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+            <div class="layui-input-inline ">
+                <input type="text" id="maxAge" name="MaxAge" value="{{ d.params.maxAge || '' }}" lay-verify="required|number|positive" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">能力类型</label>
+            <div class="layui-input-inline ">
+                <select id="abilityType" name="AbilityTypeId" lay-verify="required|select" lay-filter="abilityType-filter"></select>
+            </div>
+            <div class="layui-input-inline ">
+                <select id="firstAbilities" name="FirstAbilityId" lay-verify="required|select" lay-filter="firstAbilities-filter"></select>
+            </div>
+            <div class="layui-input-inline ">
+                <select id="secondAbilities" name="SecondAbilityId" lay-verify="required|select"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">取题数量</label>
+            <div class="layui-input-block ">
+                <input type="text" id="QuestionNum" name="PushQuestionNum" value="{{ d.params.pushQuestionNum || '' }}" lay-verify="required|mainnumber" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <input type="radio" name="Status" value="true" title="启用">
+                <input type="radio" name="Status" value="false" title="禁用">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序方式</label>
+            <div class="layui-input-block">
+                <input type="radio" name="OrderType" value="1" title="随机">
+                <input type="radio" name="OrderType" value="2" title="手动">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">结束时长</label>
+            <div class="layui-input-block">
+                <input type="text" readonly="readonly" placeholder="HH:mm:ss" value="{{ d.params.endTime || '' }}" name="EndTime" id="endTime" lay-verify="required" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+            <div class="layui-form-item">
+                <label class="layui-form-label">Icon</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-normal" id="uploadicon"><i class="layui-icon"></i>上传图片</button>
+                    <div class="layui-inline layui-word-aux">
+                        上传图片大小为2M以内，格式为jpg、png
+                        {{# if(d.params.icon!=null&&d.params.icon!=""){ }}
+                        <img class="layui-upload-img" id="showicon"  src="{{ d.params.icon || '' }}?x-oss-process=image/resize,h_50,w_50">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showicon" >
+                        {{# } }}
+                    </div>
+                    <input type="hidden" id="icon"  name="Icon" value="{{ d.params.icon || '' }}" lay-verify="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+            <div class="layui-form-item">
+                <label class="layui-form-label">Banner</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-normal" id="uploadcoverPlanUri"><i class="layui-icon"></i>上传图片</button>
+                    <div class="layui-inline layui-word-aux">
+                        上传图片大小为2M以内，格式为jpg、png
+                        {{# if(d.params.coverPlanUri!=null&&d.params.coverPlanUri!=""){ }}
+                        <img class="layui-upload-img" id="showcoverPlanUri" src='{{ d.params.coverPlanUri|| '' }}?x-oss-process=image/resize,h_80,w_100'>
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showcoverPlanUri">
+                        {{# } }}
+                    </div>
+                    <input type="hidden" id="coverPlanUri" value="{{ d.params.coverPlanUri || '' }}" name="CoverPlanUri" lay-verify="" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">粗分说明</label>
+            <div class="layui-input-block ">
+                <textarea placeholder="" lay-verify="required|normallengthT" class="layui-textarea" id="roughDescription" name="RoughDescription">{{ d.params.roughDescription || '' }}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">描述</label>
+            <div class="layui-input-block ">
+                <textarea placeholder="请输入内容" maxlength="300" class="layui-textarea" id="remark" name="Remark"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button type="button" class="layui-btn" lay-filter="questiongroup-edit-form-submit" lay-submit="questiongroup-edit-form-submit">保存</button>
+        </div>
+    </script>
+</form>

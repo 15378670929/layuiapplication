@@ -1,0 +1,416 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a href="#/content/question/index"><cite>题目管理</cite></a>
+        <a><cite>添加题目</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card padding15">
+        <form class="layui-form" id="question-add-form" lay-filter="question-add-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目类型</label>
+                <div class="layui-input-block ">
+                    <select id="QuestionType" name="QuestionType" lay-filter="questionType-filter">
+                        <option value="" selected>请选择</option>
+                        <option value="1">单选题</option>
+                        <option value="2">多选题</option>
+                        <option value="3">量表题</option>
+                        <option value="4">矩阵单选</option>
+                        <option value="5">矩阵多选</option>
+                        <option value="6">矩阵量表</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目名称</label>
+                <div class="layui-input-block">
+                    <textarea class="layui-textarea" id="Name" name="Name" lay-verify="required"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-normal" id="uploadImg"><i class="layui-icon"></i>上传图片</button>
+                    <div class="layui-inline layui-word-aux">
+                        上传图片大小为2M以内，格式为jpg、png
+                        <img class="layui-upload-img" id="showImg">
+                    </div>
+                    <input type="hidden" id="attachmentUrl" name="AttachmentUrl" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目版本</label>
+                <div class="layui-input-block ">
+                    <input type="text" id="Version" name="Version" lay-verify="required|versions" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">难度系数</label>
+                <div class="layui-input-block ">
+                    <input type="text" id="DegreeOfDifficulty" name="DegreeOfDifficulty" lay-verify="required" onkeyup="var p2 = parseFloat(value).toFixed(2);value = p2>0?(/\.0?$/.test(value)?value:p2.replace(/0$/,'').replace(/\.0$/,'')):''" onblur="value = value.replace(/\.0*$/,'')" maxlength="5" autocomplete="off" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">能力类型</label>
+                <div class="layui-input-inline ">
+                    <select id="abilityType" name="abilityType" lay-verify="required|select" lay-filter="abilityType-filter"></select>
+                </div>
+                <div class="layui-input-inline ">
+                    <select id="firstAbilities" name="firstAbilities" lay-verify="required|select" lay-filter="firstAbilities-filter"></select>
+                </div>
+                <div class="layui-input-inline ">
+                    <select id="secondAbilities" name="secondAbilities" lay-verify="required|select"></select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注信息</label>
+                <div class="layui-input-block ">
+                    <input type="text" id="Remark" name="Remark" maxlength="100" lay-verify="remarktext" autocomplete="off" placeholder="" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目解析</label>
+                <div class="layui-input-block ">
+                    <textarea id="Analysis" name="Analysis" maxlength="200" lay-verify="analysistext" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item" id="rowtitle_table">
+                <label class="layui-form-label">行标题</label>
+                <div class="layui-input-block">
+                    <textarea id="questionrowtitle" name="questionrowtitle" maxlength="200" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目选项</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-xs btn-questions-manage" data-type="additems"><i class="layui-icon"></i>添加选项</button>
+                </div>
+                <div class="layui-input-block">
+                    <table class="question-add-table">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>分值</th>
+                                <th>是否正确答案</th>
+                                <th>显示顺序</th>
+                                <th>附件</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_items"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="layui-form-item content-center">
+                <button type="button" class="layui-btn" lay-filter="question-add-form-submit" lay-submit="question-add-form-submit">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['upload', 'setter', 'form', 'verification', 'layedit', 'element'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form
+            , element = layui.element
+            , common = layui.common
+            , layedit = layui.layedit
+            , upload = layui.upload;
+
+        form.render(null, 'question-add-form');
+
+        $("#rowtitle_table").hide();
+        layedit.set({
+            uploadImage: {
+                url: setter.apiAddress.image.imageeditupload //接口url
+                , type: 'post' //默认post
+            }
+        });
+        // var questionname = layedit.build('Name');
+        //建立编辑器
+        form.on('select(questionType-filter)', function (data) {
+            var questionTypeVal = data.value;
+            if (questionTypeVal == 4 || questionTypeVal == 5 || questionTypeVal == 6) {
+                $("#rowtitle_table").show();
+            } else {
+                $("#rowtitle_table").hide();
+            }
+        });
+
+        //表单验证
+        form.verify({
+            remarktext: [
+                /^[\S]{0,200}$/
+                , '备注最多200个字符，且不能出现空格'
+            ],
+            analysistext: [
+                /^[\S]{0,200}$/
+                , '题目解析最多200个字符，且不能出现空格'
+            ],
+        });
+
+        var initPage = {
+            //能力类型
+            initAbilityType: function () {
+                common.ajax(setter.apiAddress.ability.selname, "GET", "", { level: 0 }, function (res) {
+                    common.select("abilityType", res.data, "", 1);
+                    form.render("select");
+                });
+            },
+            initFirstAbilities: function (data) {
+                $("#firstAbilities").empty();
+                $("#secondAbilities").empty();
+                if (data.value != "") {
+                    common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                        common.select("firstAbilities", res.data, "", 1);
+                        form.render("select");
+                    });
+                }
+                else {
+                    $("#firstAbilities").empty();
+                    $("#secondAbilities").empty();
+                    form.render("select");
+                }
+            },
+            initSecondAbilities: function (data) {
+                $("#secondAbilities").empty();
+                if (data.value != "") {
+                    common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                        common.select("secondAbilities", res.data, "", 1);
+                        form.render("select");
+                    });
+                }
+                else {
+                    common.select("secondAbilities", [{ id: "", name: "" }], 1, 1);
+                    form.render("select");
+                }
+            },
+            initDeleteButtonEvent: function (btnId) {
+                $("#delete_" + btnId).click(function (obj) {
+                    $("#tr_" + btnId).remove();
+                });
+                $("#tbody_items input[name='displayOrder']").keyup(function () {
+                    var c = $(this);
+                    if (/[^\d]/.test(c.val())) {
+                        var temp_amount = c.val().replace(/[^\d]/g, '');
+                        $(this).val(temp_amount);
+                    }
+                });
+                $("#tbody_items input[name='score']").keyup(function () {
+                    var c = $(this);
+                    if (/[^\d]/.test(c.val())) {
+                        var temp_amount = c.val().replace(/[^\d]/g, '');
+                        $(this).val(temp_amount);
+                    }
+                })
+            },
+            initUploadEvent: function (id) {
+                //图片上传
+                var uploadInst = upload.render({
+                    elem: '#upbtn_' + id
+                    , url: setter.apiAddress.image.imageupload+"?filePath=content/question/add"
+                    , field: "imgFile"
+                    , accept: 'file'
+                    , size: 10240
+                    , exts: 'jpg|png'
+                    , data: { imgType: "1" }
+                    , before: function (obj) {
+                        obj.preview(function (index, file, result) {
+                            $('#upimg_' + id).attr('src', result); //图片链接（base64）
+                        });
+                    }
+                    , done: function (res) {
+                        if (res.code == 200) {
+                            $("#itemimg_" + id).val(res.data.src);
+                            layer.msg(res.msg);
+                        }
+                    }
+                    , error: function () {
+                        //演示失败状态，并实现重传
+                        var demoText = $('#uptext_' + id);
+                        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                        demoText.find('.demo-reload').on('click', function () {
+                            uploadInst.upload();
+                        });
+                    }
+                });
+            },
+            initEditEvent: function (id) {
+                layedit.build('itemTitle_' + id);
+            }
+        }
+
+        initPage.initAbilityType();
+        form.on('select(abilityType-filter)', function (data) {
+            initPage.initFirstAbilities(data);
+        });
+        form.on('select(firstAbilities-filter)', function (data) {
+            initPage.initSecondAbilities(data);
+        });
+
+        var active = {
+            additems: function () {
+                var rowCount = common.guid();
+                var itemArr = new Array();
+                itemArr.push('<tr id="tr_' + rowCount + '">');
+                itemArr.push('<td >');
+
+                itemArr.push('<input type="text" name="itemTitle" autocomplete="off" maxlength="200" placeholder="请输入标题" class="layui-input" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;">');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<input type="text" name="score" autocomplete="off" maxlength="2" value="0" placeholder="请输入分值" class="layui-input">');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<select name="QuestionType_' + rowCount + '"> ');
+                itemArr.push('<option value = "false" selected = "" >否</option >');
+                itemArr.push('<option value="true">是</option>');
+                itemArr.push('</select >');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<input type="text" name="displayOrder" maxlength="1" value="0" placeholder="请输入显示顺序" class="layui-input">');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<input type="hidden" name="itemAttachmentUrl" id="itemimg_' + rowCount + '" class="layui-input">');
+                itemArr.push('<div class="layui-upload">');
+                itemArr.push('<button type="button" class="layui-btn layui-btn-xs" id="upbtn_' + rowCount + '">上传图片</button>');
+                itemArr.push('<img class="layui-upload-img" id="upimg_' + rowCount + '">');
+                itemArr.push('<p id="uptext_' + rowCount + '"></p>');
+                itemArr.push('</div>');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<button id="delete_' + rowCount + '" type="button" class="btn-delete layui-btn layui-btn-sm layui-btn-danger" rownumber="' + rowCount + '"><i class="layui-icon layui-icon-delete"></i></button>');
+                itemArr.push('</td>');
+
+                itemArr.push('</tr> ');
+                $("#tbody_items").append(itemArr.join(''));
+                form.render();
+                initPage.initDeleteButtonEvent(rowCount);
+                initPage.initUploadEvent(rowCount);
+                // initPage.initEditEvent(rowCount);
+            }
+        };
+
+        //普通图片上传
+        upload.render({
+            elem: '#uploadImg'
+            , url: setter.apiAddress.image.imageupload+"?filePath=content/question/add"
+            , field: "imgFile"
+            , accept: 'file'
+            , size: 2048
+            , exts: 'jpg|png'
+            , data: { imgType: "1" }
+            , before: function (obj) {
+                obj.preview(function (index, file, result) {
+                    $('#showImg').attr('src', result); //图片链接（base64）
+                    $('#showImg').css('width', '80px');
+                });
+            }
+            , done: function (res) {
+                if (res.code == 200) {
+                    $("#attachmentUrl").val(res.data.src);
+                    layer.msg(res.msg);
+                }
+            }
+            , error: function (e) {
+                layer.msg("上传失败!");
+            }
+        });
+
+        //提交数据
+        form.on('submit(question-add-form-submit)', function () {
+            var data = {
+                QuestionType: $("#QuestionType").val(),
+                Name: document.getElementById("Name").value,//layedit.getContent(questionname),
+                Version: $("#Version").val(),
+                DegreeOfDifficulty: $("#DegreeOfDifficulty").val(),
+                Remark: $("#Remark").val(),
+                Analysis: $("#Analysis").val(),
+                AbilityTypeId: $("#abilityType").val(),
+                FirstAbilityId: $("#firstAbilities").val(),
+                SecondAbilityId: $("#secondAbilities").val(),
+                AttachmentUrl: $("#attachmentUrl").val(),
+                QuestionItems: [],
+            };
+
+            //添加选项
+            $("#tbody_items").find("tr").each(function () {
+                var tdArr = $(this).children();
+                var itemTitle = tdArr.eq(0).find('input').val();
+                if (itemTitle != "") {
+                    if (!/^[\S]{1,200}$/.test(itemTitle)) {
+                        layer.msg("题目选项必须输入1到200个字符");
+                        return;
+                    }// /^\d+(\.{1}\d+)?$/
+                }
+                var score = tdArr.eq(1).find('input').val();
+                if (! /^\d+(\.{1}\d+)?$/.test(score)) {
+                    layer.msg("分值只能是数字2到200个字符");
+                    return;
+                }
+                var isRightChoice = tdArr.eq(2).find('select').val();
+                var displayOrder = tdArr.eq(3).find('input').val() == "" ? 0 : tdArr.eq(3).find('input').val();
+                if (! /^\d+(\.{1}\d+)?$/.test(score)) {
+                    layer.msg("显示顺序只能是数字");
+                    return;
+                }
+                var itemAttachmentUrl = tdArr.eq(4).find('input:hidden').val();
+                data.QuestionItems.push({
+                    ItemTitle: itemTitle,
+                    ItemType: 0,
+                    IsRightChoice: isRightChoice,
+                    Score: score,
+                    DisplayOrder: displayOrder,
+                    ItemAttachmentUrl: itemAttachmentUrl
+                });
+            });
+
+            //如果是矩阵题则添加行标题
+            var questionTypeVal = $("#QuestionType").val();
+            if (questionTypeVal == 4 || questionTypeVal == 5 || questionTypeVal == 6) {
+                var rowtitles = $("#questionrowtitle").val();
+                var rowtitiesarry = $("#questionrowtitle").val().split("\n");
+                var areaRows = rowtitiesarry.length;
+                for (var i = 0; i < areaRows; i++) {
+                    data.QuestionItems.push({
+                        ItemTitle: rowtitiesarry[i],
+                        ItemType: 1,
+                        Score: 0,
+                        DisplayOrder: i + 1,
+                    });
+                }
+            }
+            if (data.QuestionItems.length <= 0) {
+                layer.msg("题目没有选项");
+                return;
+            }
+            //if ($("#attachmentUrl").val() == "") {
+            //    layer.msg("请上传图标");
+            //    return;
+            //}
+            common.ajax(setter.apiAddress.question.add, "POST", "", data, function (res) {
+                if (res.statusCode == 200) {
+                    location.hash = '/content/question/index';
+                    layer.msg("success");
+                }
+                layer.msg(res.message);
+            });
+        });
+        $('.layui-btn.btn-questions-manage').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

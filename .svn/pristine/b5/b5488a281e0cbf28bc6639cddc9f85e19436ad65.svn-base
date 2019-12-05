@@ -1,0 +1,71 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item" lay-filter="classes-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择机构</label>
+            <div class="layui-input-block ">
+                <select class="sel" id="orgId" name="OrgId" lay-verify="required|select" lay-filter="orgfilter"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">选择班级</label>
+            <div class="layui-input-block ">
+                <select class="sel" id="classId" name="ClassId" lay-verify="required|select" lay-filter=""></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">真实姓名</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                    <input type="text" name="RealName" value="{{ d.params.realName || '' }}" maxlength="10" lay-verify="required|chineselength" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">学号</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="StudentNumber" maxlength="20" id="studentNumber" value="{{ d.params.studentNumber || '' }}" lay-verify="numenglishIstrue" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label lines">身份证号码</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="IdCard" value="{{ d.params.idCard || '' }}" maxlength="18" lay-verify="idcardIstrue" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label lines">手机号</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="Mobile" value="{{ d.params.mobile || '' }}" maxlength="11" placeholder="" lay-verify="isPhoneNumber" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">出生日期</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" readonly="readonly" name="Birthday" id="birthday" value="{{ d.params.birthday || '' }}" lay-verify="required|nowdate" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">性别</label>
+            <div class="layui-input-block">
+                <input type="radio" name="Gender" value="男" title="男">
+                <input type="radio" name="Gender" value="女" title="女">
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="userprofile-form-submit">保存</button>
+        </div>
+    </div>
+</form>

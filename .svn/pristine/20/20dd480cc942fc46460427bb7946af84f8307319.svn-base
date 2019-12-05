@@ -1,0 +1,154 @@
+﻿/**
+ @Name：机构管理
+ */
+layui.define(['table', 'form', 'common', 'setter', 'verification'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , form = layui.form;
+
+    table.render({
+        elem: '#organization-table'
+        , url: setter.apiAddress.organization.list
+        , cols: [[
+            { field: 'name', title: '机构名称' },
+            { field: 'officer', width: 150, title: '负责人' },
+            { field: 'officerPhone', width: 150, title: '联系方式' },
+            {
+                title: '地址', templet: function (d) {
+                    return d.province + d.city + d.district + d.address;
+                }
+            },
+            {
+                field: 'status', title: '状态', align: 'center', width: 100,
+                templet: function (d) { return d.status == 1 ? '<span style="color:#009688;">启用</span>' : '<span style="color:#FF5722;">禁用</span>'; }
+            },
+            {
+                field: 'createtime', width: 150, title: '创建时间', align: 'center', templet: function (d) {
+                    return common.formatDate(d.createtime, "yyyy-MM-dd hh:mm")
+                }
+            },
+            {
+                width: 150, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    if (d.status) {
+                        htmlButton.push('<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="changestatus"><i class="layui-icon layui-icon-close"></i>禁用</a>');
+                    } else {
+                        htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                    }
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: true
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.data.totalCount,
+                "data": res.data.items
+            };
+        }
+    });
+
+    //编辑&修改状态&报告模板设置
+    table.on('tool(organization-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'changestatus') {
+            var titletext = "确认禁用？";
+            if (!data.status) {
+                titletext = "确认启用？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.organization.updatestatus, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        layui.table.reload('organization-table');
+                    }
+                    layer.msg(res.message);
+                })
+            });
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑'
+                , area: ['500px', '600px']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('usercenter/organization/edit', data).done(function () {
+                        $("input[name=status][value=false]").attr("checked", data.status == 0 ? true : false);
+                        $("input[name=status][value=true]").attr("checked", data.status == 1 ? true : false);
+                        form.render();
+                        //加载地区信息并设置默认值
+                        common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: 1 }, function (res) {
+                            common.select("provinceEditId", res.data, data.provinceId, 1);
+                            $("#province").val($("#provinceEditId").find("option:selected").text());
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.provinceId }, function (res) {
+                                common.select("cityEditId", res.data, data.cityId, 2);
+                                form.render("select");
+                                $("#city").val($("#cityEditId").find("option:selected").text());
+                            })
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.cityId }, function (res) {
+                                common.select("districtEditId", res.data, data.districtId, 3);
+                                form.render("select");
+                                $("#district").val($("#districtEditId").find("option:selected").text());
+                            })
+                            form.render("select");
+                        });
+                        //监听省份下拉框事件
+                        form.on('select(provincefilter)', function (data) {
+                            $("#province").val($("#provinceEditId").find("option:selected").text());
+                            $("#cityEditId").empty();
+                            $("#city").val("");
+                            $("#districtEditId").empty();
+                            $("#district").val("");
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                common.select("cityEditId", res.data, "", 1);
+                                form.render("select");
+                            })
+                        });
+                        //监听城市下拉框事件
+                        form.on('select(cityfilter)', function (data) {
+                            $("#city").val($("#cityEditId").find("option:selected").text());
+                            $("#districtEditId").empty();
+                            $("#district").val("");
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                common.select("districtEditId", res.data, "", 1);
+                                form.render("select");
+                            })
+                        });
+                        //监听地区下拉框事件
+                        form.on('select(districtfilter)', function (data) {
+                            $("#district").val($("#districtEditId").find("option:selected").text());
+                        });
+                        //监听提交
+                        form.on('submit(organization-form-submit)', function (data) {
+                            common.ajax(setter.apiAddress.organization.update, "POST", "", $("#organization-edit-form").serialize(), function (res) {
+                                if (res.statusCode == 200) {
+                                    layer.close(index);
+                                    table.reload('organization-table');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    });
+    exports('organization', {})
+});

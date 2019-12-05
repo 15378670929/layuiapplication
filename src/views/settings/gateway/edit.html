@@ -1,0 +1,92 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="gateway-edit-form" lay-filter="gateway-edit-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">网关名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="hidden" id="Id" name="Id" value="{{ d.params.id || '' }}" />
+                <input type="text" id="Name" name="Name" value="{{ d.params.name || '' }}" lay-verify="required" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">全局key</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="RequestIdKey" name="RequestIdKey" value="{{ d.params.requestIdKey || '' }}" lay-verify="required" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">根地址</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="BaseUrl" name="BaseUrl" value="{{ d.params.baseUrl || '' }}" lay-verify="required" autocomplete="off" maxlength="100" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">下游架构</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="DownstreamScheme" name="DownstreamScheme" value="{{ d.params.downstreamScheme || '' }}" lay-verify="" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">服务发现</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea id="ServiceDiscoveryProvider" name="ServiceDiscoveryProvider" lay-verify="required" placeholder="" maxlength="500" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.serviceDiscoveryProvider),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">负载均衡</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea name="LoadBalancerOptions" lay-verify="required" placeholder="" maxlength="500" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.loadBalancerOptions),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">Http</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea name="HttpHandlerOptions" lay-verify="required" placeholder="" maxlength="500" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.httpHandlerOptions),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">安全配置</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <textarea name="QoSOptions" lay-verify="required" placeholder="" maxlength="500" class="layui-textarea">{{ JSON.stringify(JSON.parse(d.params.qoSOptions),null,2) }}</textarea>
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">是否默认</label>
+        <div class="layui-input-block">
+            <select name="IsDefault">
+                <option value="false">否</option>
+                <option value="true">是</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">是否有效</label>
+        <div class="layui-input-block">
+            <select name="Status">
+                <option value="false">无效</option>
+                <option value="true">有效</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="gateway-edit-form-submit" lay-submit="gateway-edit-form-submit">保存</button>
+    </div>
+</form>

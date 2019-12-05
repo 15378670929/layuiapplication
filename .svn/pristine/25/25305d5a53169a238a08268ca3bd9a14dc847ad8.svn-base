@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\views",
+    "\\src\\views\\settings\\clientmodules",
+    "\\src\\views\\settings\\clientmodulesbuttons",
+    "\\src\\views\\usercenter",
+    "\\start"
+  ],
+  "SelectedNode": "\\src\\views\\layout.html",
+  "PreviewInSolutionExplorer": false
+}

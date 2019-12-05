@@ -1,0 +1,49 @@
+﻿<form class="layui-form" id="modules-add-form" lay-filter="modules-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属应用</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="add-clientId" name="ClientId" lay-verify="required|select" lay-filter=""></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">模块名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="Name" name="Name" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">所属模块</label>
+        <div class="layui-input-block">
+            <input type="hidden" id="parentId" name="parentId" />
+            <input type="hidden" id="clientId" name="clientId" />
+            <input type="text" id="module-select-tree" lay-filter="module-select-tree" readonly="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">模块描述</label>
+        <div class="layui-input-block">
+            <input type="text" id="DescText" name="DescText" lay-verify="required|describelength" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">转跳地址</label>
+        <div class="layui-input-block">
+            <input type="text" id="RedirectUri" name="RedirectUri" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">Icon</label>
+        <div class="layui-input-block">
+            <input type="text" id="Icon" name="Icon" maxlength="50" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">显示顺序</label>
+        <div class="layui-input-block">
+            <input type="text" id="DisplayOrder" name="DisplayOrder" lay-verify="required|number" maxlength="4" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="modules-form-submit" lay-submit="modules-form-submit">保存</button>
+    </div>
+</form>

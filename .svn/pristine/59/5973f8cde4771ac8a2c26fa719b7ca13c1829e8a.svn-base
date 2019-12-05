@@ -1,0 +1,49 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="user-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="0">用户明细</li>
+        <li lay-id="1">用户配置</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <!--用户明细-->
+        <div class="layui-tab-item layui-show">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="user-config-search">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">班级</label>
+                        <div class="layui-input-inline">
+                            <select class="sel" name="ClassId" id="classId" lay-verify="" lay-filter="" placeholder="请选择班级"></select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button type="button" class="layui-btn btn-user-search" data-type="usersave">搜索</button>
+                        <button type="button" class="layui-btn btn-configgroup" data-type="userdels">批量删除</button>
+                    </div>
+                </div>
+            </div>
+            <table class="layui-table" id="userconfig-table" lay-filter="userconfig-table"></table>
+        </div>
+        <!--用户配置-->
+        <div class="layui-tab-item">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="course-group-search">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">班级</label>
+                        <div class="layui-input-inline">
+                            <select class="sel" name="ClassId" id="class-search-sel" lay-verify="" lay-filter="" placeholder="请选择班级"></select>
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button type="button" class="layui-btn btn-search" data-type="usersave">搜索</button>
+                        <button type="button" class="layui-btn btn-usersave" data-type="usersave">添加</button>
+                    </div>
+                </div>
+            </div>
+            <table class="layui-table" id="user-table" lay-filter="user-table"></table>
+        </div>
+    </div>
+</div>
+
+

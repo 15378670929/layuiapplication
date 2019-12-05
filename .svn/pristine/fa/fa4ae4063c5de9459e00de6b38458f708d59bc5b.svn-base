@@ -1,0 +1,70 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a href="#/settings/applicationtemplate/index"><cite>系统模块管理</cite></a>
+        <a><cite>模块权限</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="dicability-search">
+            <div class="layui-form-item">
+                <button class="layui-btn btn-application-buttons" data-type="add">添加</button>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="application-buttons-table" lay-filter="application-buttons-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('applicationbuttons', layui.factory('applicationbuttons')).use(['admin', 'applicationbuttons', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render();
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['50%', '40%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('settings/applicationtemplate/addbutton').done(function () {
+                            form.render();
+                            form.on('submit(button-add-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.SysFunction.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        table.reload('application-buttons-table');
+                                        layer.close(index);
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-application-buttons').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

@@ -1,0 +1,131 @@
+﻿<title>课时管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a href="#/content/course/index"><cite>课程管理</cite></a>
+        <a><cite>课时管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="childrencourse-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="courseClass" name="CourseClass" lay-filter="">
+                        <option value="">请选择课时类型</option>
+                        <option value="1">测评课时</option>
+                        <option value="2">训练课时</option>
+                    </select>
+                </div>
+                <div class="layui-inline">
+                    <div class="layui-input-inline">
+                        <input type="text" id="name" maxlength="20" placeholder="请输入课时名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-course" lay-submit lay-filter="childrencourse-search">搜索</button>
+                    <button class="layui-btn btn-childcourse" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="childrencourse-table" lay-filter="childrencourse-table"></table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use('childrencourse', layui.factory('childrencourse')).use(['admin', 'table', 'verification', 'childrencourse', 'common', 'setter', 'layer', 'form'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , layer = layui.layer
+            , setter = layui.setter
+            , table = layui.table
+            , form = layui.form
+            , common = layui.common;
+        form.render('select');
+        form.render(null, 'childcourse-search');
+        table.render({
+            elem: '#childrencourse-table'
+            , id: 'childrencourseid'
+            , url: setter.apiAddress.childrencourse.list
+            , cols: [[
+                { field: 'name', title: '名称' },
+                {
+                    field: 'courseClass', title: '课程类型', align: 'center', width: 100,
+                    templet: function (d) {
+                        switch (d.courseClass) {
+                            case 1:
+                                return '<span style="color:#1E9FFF;">测评课时</span>';
+                                break;
+                            case 2:
+                                return '<span style="color:#FF5722;">训练课时</span>';
+                                break;
+                            default:
+                                return '<span style="color:#2F4056;">未知类型</span>';
+                        }
+                    }
+                },
+                { field: 'remark', title: '备注' },
+                { field: 'version', title: '版本', width: 100, align: 'center' },
+                {
+                    field: 'status', title: '状态', align: 'center', width: 100,
+                    templet: function (d) { return d.status == 1 ? '<span style="color:#009688;">启用</span>' : '<span style="color:#FF5722;">禁用</span>'; }
+                },
+                {
+                    field: 'displayOrder', title: '排序', align: 'center', width: 100
+                },
+                {
+                    field: 'createTime', width: 150, title: '创建时间', templet: function (d) {
+                        return common.formatDate(d.createTime, "yyyy-MM-dd hh:mm")
+                    }
+                },
+                {
+                    width: 250, title: '操作', align: 'center'
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="addgame"><i class="layui-icon layui-icon-component"></i>内容</a>');
+                        if(d.courseClass ==1){
+                          htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="configweight"><i class="layui-icon layui-icon-set"></i>权重</a>');
+                        }
+                        if (d.status) {
+                            htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-close"></i>禁用</a>');
+                        } else {
+                            htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                        }
+                        htmlButton.push('</div>')
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: {
+                curr: 0
+            }
+            , where: {
+                courseId: layui.router().search.courseid
+            }
+            , height: 'full-320'
+            , cellMinWidth: 80
+            , text: {
+                none: '暂无相关数据'
+            }
+            , response: {
+                statusCode: 200
+            }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.data.totalCount,
+                    "data": res.data.items
+                };
+            }
+        });
+    });
+</script>

@@ -1,0 +1,24 @@
+﻿
+<form class="layui-form" id="client-add-form" lay-filter="client-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="clientName" name="clientName" lay-verify="required|maxInputLength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">服务地址</label>
+        <div class="layui-input-block">
+            <input type="text" id="clientUri" name="clientUri" lay-verify="required|url" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">服务描述</label>
+        <div class="layui-input-block">
+            <input type="text" id="description" name="description" lay-verify="required|describelength" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="client-form-submit" lay-submit="client-form-submit">保存</button>
+    </div>
+</form>

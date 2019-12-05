@@ -1,0 +1,32 @@
+﻿<title>项目实施</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>项目中心</cite></a>
+        <a><cite>项目实施</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="projects-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="organization" name="organization" lay-filter="orgfilter"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-projects" lay-submit lay-filter="projects-search">搜索</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="projects-table" lay-filter="projects-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('projectimplement', layui.factory('projectimplement')).use(['admin', 'verification', 'projectimplement', 'table', 'common', 'setter', 'layer'], function () {
+    });
+</script>

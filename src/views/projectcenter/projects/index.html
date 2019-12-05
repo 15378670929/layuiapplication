@@ -1,0 +1,115 @@
+﻿<title>项目管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>项目中心</cite></a>
+        <a><cite>项目管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="projects-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="organizationSelect" name="organizationId" lay-filter="organizationId" placeholder="请选择机构"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-projects" lay-submit lay-filter="projects-search">搜索</button>
+                    <button class="layui-btn btn-projects" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="projects-table" lay-filter="projects-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('projects', layui.factory('projects')).use(['admin', 'verification', 'projects', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form;
+        var common = layui.common;
+
+        // common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+        //     $("#organizationSelect").append("<option value=\"\">请选择机构</option>");
+        //     common.select("organizationSelect", res.data, "", 1);
+        //     form.render("select");
+        // });
+
+        common.ajax(setter.apiAddress.organization.loadall, "GET", "", {}, function (res) {
+            $("#organizationSelect").append("<option value=\"\">请选择机构</option>");
+            $.each(res.data, function (index, item) {
+                $("#organizationSelect").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+            });
+            form.render("select");
+        });
+
+        //搜索
+        form.on('submit(projects-search)', function (data) {
+            table.reload('projects-table', {
+                where: { organizationId: $("#organizationSelect").val() },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加项目信息'
+                    , area: ['600px', '600px']
+                    , resize: true
+                    , success: function (layero, index) {
+                        view(this.id).render('projectcenter/projects/add').done(function () {
+                            //获取下拉列表
+                            common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+                                common.select("orgId", res.data, "", 1);
+                                form.render("select");
+                            });
+                            laydate.render({
+                                elem: '#starttime'
+                                , type: 'date'
+                            });
+                            laydate.render({
+                                elem: '#endtime'
+                                , type: 'date'
+                            });
+                            form.verify({
+                                datetime: function (value, item) {
+                                    if (value >= $("#endtime").val()) {
+                                        return "开始时间不能大于等于结束时间";
+                                    }
+                                }
+                            });
+                            form.render();
+                            //监听提交
+                            form.on('submit(projects-add-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.projects.add, "POST", "", $('#project-add-form').serialize(), function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        layui.table.reload('projects-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-projects').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

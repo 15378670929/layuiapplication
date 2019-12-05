@@ -1,0 +1,236 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<script type="text/html" template>
+    {{# if(d.params.questionType === 1){ }}
+    <form class="layui-form" action="">
+        <div class="layui-row">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <p><span>{{ d.params.name }}</span></p>
+                <p>
+                    <span>
+                        {{# if(d.params.attachmentUrl!=null&&d.params.attachmentUrl!=""){ }}
+                        <img class="layui-upload-img" id="showImg" src="{{ d.params.attachmentUrl || '' }}">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showImg">
+                        {{# } }}
+                        <br>
+                    </span>
+                </p>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <table class="layui-table" lay-skin="line">
+                    {{# layui.each(d.params.questionItems, function(index, item){ }}
+                    <tr>
+                        <td>
+                            {{# if(item.itemTitle!=null&&item.itemTitle!="null"&&item.itemTitle!=""){ }}
+                            <input type="radio" lay-skin="primary">{{item.itemTitle}}
+                            {{# }else{ }}
+                            <input type="radio" lay-skin="primary">
+                            {{# } }}
+                        </td>
+                        <td>
+                            {{# if(item.itemAttachmentUrl!=null&&item.itemAttachmentUrl!="null"&&item.itemAttachmentUrl!=""){ }}
+                            <img class="layui-upload-img" src='{{item.itemAttachmentUrl}}?x-oss-process=image/resize,h_80,w_80'>
+                            {{# }else{ }}
+                            <img class="layui-upload-img">
+                            {{# } }}
+                            {{# if(item.isRightChoice){ }}
+                            <i class="layui-icon layui-icon-ok"></i>
+                            {{# } }}
+                        </td>
+                    </tr>
+                    {{# }); }}
+                </table>
+            </div>
+        </div>
+    </form>
+    {{# } else if(d.params.questionType === 2) { }}
+    <form class="layui-form" action="">
+        <div class="layui-row">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <p><span>{{ d.params.name }}</span></p>
+                <p>
+                    <span>
+                        {{# if(d.params.attachmentUrl!=null&&d.params.attachmentUrl!=""){ }}
+                        <img class="layui-upload-img" id="showImg" src="{{ d.params.attachmentUrl || '' }}">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showImg">
+                        {{# } }}
+                        <br>
+                    </span>
+                </p>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <table class="layui-table" lay-skin="line">
+                    {{# layui.each(d.params.questionItems, function(index, item){ }}
+                    <tr>
+                        <td>
+                            {{# if(item.itemTitle!=null&&item.itemTitle!="null"&&item.itemTitle!=""){ }}
+                            <input type="checkbox" lay-skin="primary">{{item.itemTitle|| ''}}
+                            {{# }else{ }}
+                            <input type="checkbox" lay-skin="primary">
+                            {{# } }}
+
+                        </td>
+                        <td>
+                            {{# if(item.itemAttachmentUrl!=null&&item.itemAttachmentUrl!="null"&&item.itemAttachmentUrl!=""){ }}
+                            <img class="layui-upload-img" src='{{item.itemAttachmentUrl}}?x-oss-process=image/resize,h_80,w_80'>
+                            {{# }else{ }}
+                            <img class="layui-upload-img">
+                            {{# } }}
+                            {{# if(item.isRightChoice){ }}
+                            <i class="layui-icon layui-icon-ok"></i>
+                            {{# } }}
+                        </td>
+                    </tr>
+                    {{# }); }}
+                </table>
+            </div>
+        </div>
+    </form>
+    {{# } else if(d.params.questionType === 3) { }}
+    <form class="layui-form" action="">
+        <div class="layui-row">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <p><span>{{ d.params.name }}</span></p>
+                <p>
+                    <span>
+                        {{# if(d.params.attachmentUrl!=null&&d.params.attachmentUrl!=""){ }}
+                        <img class="layui-upload-img" id="showImg" src="{{ d.params.attachmentUrl || '' }}">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showImg">
+                        {{# } }}
+                        <br>
+                    </span>
+                </p>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                量表题预览功能开发中
+            </div>
+        </div>
+    </form>
+    {{# } else if(d.params.questionType === 4) { }}
+    <form class="layui-form" action="">
+        <div class="layui-row">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <p><span>{{ d.params.name }}</span></p>
+                <p>
+                    <span>
+                        {{# if(d.params.attachmentUrl!=null&&d.params.attachmentUrl!=""){ }}
+                        <img class="layui-upload-img" id="showImg" src="{{ d.params.attachmentUrl || '' }}">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showImg">
+                        {{# } }}
+                        <br>
+                    </span>
+                </p>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <table class="layui-table" lay-skin="line" lay-size="sm">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            {{# layui.each(d.params.questionItems, function(index, item){ }}
+                            {{# if(item.itemType==0){}}
+                            <th style="text-align:center;">
+                                {{item.itemTitle}}
+                                {{# if(item.itemAttachmentUrl!=null&&item.itemAttachmentUrl!=""&&item.itemAttachmentUrl!="null"){ }}
+                                <img class="layui-upload-img" src='{{item.itemAttachmentUrl}}?x-oss-process=image/resize,h_80,w_80'>
+                                {{# }else{ }}
+                                <img class="layui-upload-img">
+                                {{# } }}
+                            </th>
+                            {{# } }}
+                            {{# }); }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{# layui.each(d.params.questionItems, function(index, item){ }}
+                        {{# if(item.itemType==1){}}
+                        <tr>
+                            <td>{{item.itemTitle}}</td>
+                            {{# layui.each(d.params.questionItems, function(index, item){ }}
+                            {{# if(item.itemType==0){}}
+                            <td style="text-align:center;">
+                                <input type="radio" lay-skin="primary">
+                            </td>
+                            {{# } }}
+                            {{# }); }}
+                        </tr>
+                        {{# } }}
+                        {{# }); }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    {{# } else if(d.params.questionType === 5) { }}
+    <form class="layui-form" action="">
+        <div class="layui-row">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <p><span>{{ d.params.name }}</span></p>
+                <p>
+                    <span>
+                        {{# if(d.params.attachmentUrl!=null&&d.params.attachmentUrl!=""){ }}
+                        <img class="layui-upload-img" id="showImg" src="{{ d.params.attachmentUrl || '' }}">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showImg">
+                        {{# } }}
+                        <br>
+                    </span>
+                </p>
+            </div>
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                <table class="layui-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            {{# layui.each(d.params.questionItems, function(index, item){ }}
+                            {{# if(item.itemType==0){}}
+                            <th style="text-align:center;">
+                                {{item.itemTitle}}
+                                {{# if(item.itemAttachmentUrl!=null&&item.itemAttachmentUrl!="null"&&item.itemAttachmentUrl!=""){ }}
+                                <img class="layui-upload-img" src='{{item.itemAttachmentUrl}}?x-oss-process=image/resize,h_50,w_50'>
+                                {{# }else{ }}
+                                <img class="layui-upload-img">
+                                {{# } }}
+                            </th>
+                            {{# } }}
+                            {{# }); }}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{# layui.each(d.params.questionItems, function(index, item){ }}
+                        {{# if(item.itemType==1){}}
+                        <tr>
+                            <td>{{item.itemTitle}}</td>
+                            {{# layui.each(d.params.questionItems, function(index, item){ }}
+                            {{# if(item.itemType==0){}}
+                            <td style="text-align:center;">
+                                <input type="checkbox" lay-skin="primary">
+                            </td>
+                            {{# } }}
+                            {{# }); }}
+                        </tr>
+                        {{# } }}
+                        {{# }); }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+    {{# } else if(d.params.questionType === 6) { }}
+    <form class="layui-form" action="">
+        <div class="layui-row">
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                题目：{{ d.params.name }}
+            </div>
+            <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+                矩阵量表题预览功能开发中
+            </div>
+        </div>
+    </form>
+    {{# } }}
+</script>

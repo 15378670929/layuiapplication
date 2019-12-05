@@ -1,0 +1,26 @@
+﻿<title>身份资源管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a><cite>身份资源管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-card-body">
+            <table class="layui-table" id="identityresource-table" lay-filter="identityresource-table"></table>
+            <script type="text/html" id="table-identityresource-btn" lay-filter="table-identityresource-btn">
+                <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="claims"><i class="layui-icon layui-icon-set"></i>Claims</a>
+            </script>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('identityresource', layui.factory('identityresource')).use(['identityresource'], function () {
+
+    });
+</script>

@@ -1,0 +1,32 @@
+﻿<form id="button-add-form" class="layui-form" lay-filter="button-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">按钮名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="hidden" id="ModuleId" name="ModuleId" value="{{ layui.router().search.module }}" lay-verify="required" class="layui-input">
+            </script>
+            <input type="text" id="name" name="Name" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="actionName" name="ActionName" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">Icon</label>
+        <div class="layui-input-block ">
+            <input type="text" id="icon" name="Icon" lay-verify="required|normallength" maxlength="50" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">显示顺序</label>
+        <div class="layui-input-block ">
+            <input type="text" id="displayOrder" name="DisplayOrder" lay-verify="required|number" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="button-add-form-submit" lay-submit="button-add-form-submit">保存</button>
+    </div>
+</form>

@@ -1,0 +1,40 @@
+﻿<title>训练游戏管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a><cite>训练游戏</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="traingame-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="atp" name="" lay-filter="topfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="fad" name="" lay-filter="firstfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="sad"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-traingame" lay-submit lay-filter="traingame-search">搜索</button>
+                    <button class="layui-btn btn-traingame" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="traingame-table" lay-filter="traingame-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('traingame', layui.factory('traingame')).use(['traingame'], function () {
+    });
+</script>

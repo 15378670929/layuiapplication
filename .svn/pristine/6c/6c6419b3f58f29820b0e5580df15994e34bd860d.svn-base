@@ -1,0 +1,28 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<style>
+    .layui-form-label {
+        width: 150px;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="normal-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" id="region"></label>
+                </div>
+                <div class="layui-input-inline">
+                    <label class="layui-form-label" id="equipment"></label>
+                </div>
+                <div>
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" href="#" id="exportnorma">导出</a>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="norm-list-table" lay-filter="norm-list-table"></table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,73 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="modules-edit-form" lay-filter="modules-edit-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">所属应用</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="edit-clientId" name="SysApplicationId" lay-verify="required|select" lay-filter=""></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">模块名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="hidden" id="Id" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                <input type="text" id="Name" name="Name" value="{{ d.params.name || '' }}" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">所属模块</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="hidden" id="parentId" name="ParentId" value="{{ d.params.parentId || '' }}" lay-verify="required" class="layui-input">
+            </script>
+            <input type="text" id="module-edit-select-tree" value="" lay-filter="module-edit-select-tree" readonly="" class="layui-input edittype-txt">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">模块描述</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="DescText" name="Description" value="{{ d.params.description || '' }}" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">转跳地址</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="RedirectUri" name="RedirectUri" value="{{ d.params.redirectUri || '' }}" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">Icon</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="Icon" name="Icon" value="{{ d.params.icon || '' }}" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">显示顺序</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="DisplayOrder" name="DisplayOrder" value="{{ d.params.displayOrder || '0' }}" lay-verify="required|number" maxlength="3" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label lines">状态</label>
+      <div class="layui-input-block">
+          <script type="text/html" template>
+              <input type="radio" name="enabled" lay-filter="status" value="false" title="禁用">
+              <input type="radio" name="enabled" lay-filter="status" value="true" title="启用">
+          </script>
+      </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="modules-edit-form-submit" lay-submit="modules-edit-form-submit">保存</button>
+    </div>
+</form>

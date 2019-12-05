@@ -1,0 +1,114 @@
+﻿<title>班级管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>用户中心</cite></a>
+        <a><cite>班级管理</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="classes-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="provinceId" name="ProvinceId" lay-filter="provincefilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="cityId" name="CityId" lay-filter="cityfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="districtId" name="DistrictId" lay-filter="districtfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <input type="tel" name="organization" id="organizationName" class="layui-input" style="position:absolute;z-index:2;width:80%;" placeholder="请输入机构名称" onkeyup="search()" autocomplete="off">
+                    <select class="sel" id="organization" name="organization" lay-filter="orgfilter"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-classes" lay-submit lay-filter="classes-search">搜索</button>
+                    <button class="layui-btn btn-classes" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="classes-table" lay-filter="classes-table"></table>
+            <script type="text/html" id="table-operation-btn">
+                <div class="layui-btn-group">
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                    <!--<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>-->
+                </div>
+            </script>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('classes', layui.factory('classes')).use(['admin', 'classes', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        //搜索
+        form.on('submit(classes-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('classes-table', {
+                where: {
+                    provinceId: $("#provinceId").val(),
+                    cityId: $("#cityId").val(),
+                    districtId: $("#districtId").val(),
+                    organizationName: $("#organizationName").val()
+                },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加班级信息'
+                    , area: ['480px', '60%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('usercenter/classes/add').done(function () {
+                            //获取机构
+                            common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+                                common.select("orgId", res.result, "", 1);
+                                form.render("select");
+                            });
+                            laydate.render({
+                                elem: '#startschoolyear'
+                                , type: 'year'
+                            });
+                            //监听提交
+                            form.on('submit(classes-form-submit)', function (data) {
+                                common.ajax(setter.apiAddress.classes.add, "POST", "", $('#classes-add-form').serialize(), function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        table.reload('classes-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-classes').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

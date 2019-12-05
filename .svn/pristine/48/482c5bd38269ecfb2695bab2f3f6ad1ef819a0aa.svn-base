@@ -1,0 +1,243 @@
+<title>模板配置</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a href="#/report/reportconfig/index"><cite>机构模板配置</cite></a>
+        <a><cite>模板配置</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="reportconfig-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button id="organization" type="button" class="layui-btn layui-btn-normal"></button>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-reportconfig" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="report-config-table" lay-filter="report-config-table"></table>
+            <script type="text/html" id="table-operation-btn">
+                <div class="layui-btn-group">
+                    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>
+                </div>
+            </script>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('reportconfig', layui.factory('reportconfig')).use(['admin', 'reportconfig', 'form', 'table', 'common', 'setter', 'layer', 'laydate', 'verification'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form
+            , common = layui.common;
+
+        table.render({
+            elem: '#report-config-table'
+            , url: setter.apiAddress.reportconfig.list
+            , cols: [[
+                {
+                    field: 'templateId', title: '模板名称',
+                    templet: function (d) {
+                        if (null !== d.reportTemplateDto) {
+                            return d.reportTemplateDto.name
+                        } else {
+                            return '/'
+                        }
+                    }
+                },
+                {
+                    field: 'templateTypeId', title: '模板类型',
+                    templet: function (d) {
+                        if (null !== d.reportTemplateTypeDto) {
+                            return d.reportTemplateTypeDto.name
+                        } else {
+                            return '/'
+                        }
+                    }
+                },
+                {
+                    field: 'templateAttribute', title: '模板属性', align: 'center', width: 100,
+                    templet: function (d) {
+                        switch (d.templateAttribute) {
+                            case 1:
+                                return "个人测评";
+                                break;
+                            case 2:
+                                return "个人训练";
+                                break;
+                            case 3:
+                                return "团体测评";
+                                break;
+                            case 4:
+                                return "团体训练";
+                                break;
+                            default:
+                                return "/";
+                        }
+                    }
+                },
+                {
+                    field: 'isDefault', title: '是否默认', width: 150, align: 'center',
+                    templet: function (d) {
+                        if (d.isDefault) {
+                            return '<input type="checkbox" name="isDefault" value="' + d.id + '" lay-skin="switch" lay-filter="changeIsDefault" lay-text="是|否" checked>'
+                        } else {
+                            return '<input type="checkbox" name="isDefault" value="' + d.id + '" lay-skin="switch" lay-filter="changeIsDefault"lay-text="是|否">'
+                        }
+                    }
+                },
+                {
+                    width: 150, title: '操作', align: 'center'
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="preview"><i class="layui-icon layui-icon-menu-fill"></i>预览</a>');
+                        htmlButton.push('</div>')
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: true
+            , height: 'full-320'
+            , cellMinWidth: 80
+            , text: {
+                none: '暂无相关数据'
+            }
+            , response: {
+                statusCode: 200
+            }
+            , where: {
+                organizationId: layui.router().search.organization
+            }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.data.totalCount,
+                    "data": res.data.items
+                };
+            }
+        });
+
+        // 获取当前机构名称
+        common.ajax(setter.apiAddress.organization.detail, "POST", "", { id: layui.router().search.organization }, function (res) {
+            $("#organization").html("当前机构：" + res.data.name)
+        });
+
+        form.render();
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['45%', '40%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('report/reportconfig/add').done(function (obj) {
+                            //加载所有模板类型
+                            common.ajax(setter.apiAddress.templatetype.loadall, "GET", "", "", function (res) {
+                                $("#templateTypeId").empty();
+                                $("#templateTypeId").append("<option value=\"\">请选择模板类型</option>");
+                                $("#templateId").append("<option value=\"\">请选择报告模板</option>");
+                                $.each(res.data, function (index, item) {
+                                    $("#templateTypeId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                });
+                                form.render("select");
+                            });
+                            //模板类型事件
+                            form.on('select(templateTypeIdfilter)', function (data) {
+                                common.ajax(setter.apiAddress.reporttemplate.loadall, "GET", "", { typeId: data.value }, function (res) {
+                                    $("#templateId").empty();
+                                    $("#templateId").append("<option value=\"\">请选择报告模板</option>");
+                                    $.each(res.data, function (index, item) {
+                                        $("#templateId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                    });
+                                    form.render("select");
+                                });
+                            });
+
+                            form.render();
+
+                            //监听提交
+                            form.on('submit(report-config-form-submit)', function (data) {
+                                data.field.OrganizationId = layui.router().search.organization;
+                                common.ajax(setter.apiAddress.reportconfig.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        table.reload('report-config-table');
+                                    }
+                                    layer.msg(res.message);
+                                }, function (error) {
+                                    layer.msg(error.msg);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+
+        // 切换默认状态
+        form.on('switch(changeIsDefault)', function (data) {
+            var isDefault = data.elem.checked;
+            layer.open({
+                content: '确认切换默认选项吗？'
+                , btn: ['确定', '取消']
+                , yes: function (index, layero) {
+                    //确认按钮的回调
+                    common.ajax(setter.apiAddress.reportconfig.updateisdefault, "POST", "", { id: data.elem.value }, function (res) {
+                        if (res.statusCode == 200) {
+                            layer.close(index);
+                            table.reload('report-config-table');
+                        }
+                        layer.msg(res.message);
+                    });
+                }
+                , btn2: function (index, layero) {
+                    //取消按钮的回调
+                    data.elem.checked = !isDefault;
+                    form.render();
+                    layer.close(index);
+                }
+                , cancel: function (index, layero) {
+                    //右上角关闭回调
+                    data.elem.checked = !isDefault;
+                    form.render();
+                    layer.close(index);
+                }
+            });
+            return false;
+        });
+
+        //预览模板
+        table.on('tool(report-config-table)', function (obj) {
+            if (obj.event === 'preview') {
+                layer.open({
+                    type: 1,
+                    title: '预览',
+                    area: ['60%', '70%'],
+                    content: obj.data.reportTemplateDto.context
+                });
+            }
+        })
+
+        $('.layui-btn.btn-reportconfig').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>

@@ -1,0 +1,482 @@
+/**
+ @Name：全局配置
+ */
+layui.define(['laytpl', 'layer', 'element', 'util'], function (exports) {
+    //网关地址
+    var apiGatewayAddress = 'http://gateway.alpha.iquizoo.com'
+    exports('setter', {
+        container: 'IQuizoo_app' //容器ID
+        , apiurl: '/gateway.alpha.iquizoo.com'
+        , base: layui.cache.base //记录layuiAdmin文件夹所在路径
+        , views: layui.cache.base + 'views/' //视图所在目录
+        , entry: 'index' //默认视图文件名
+        , engine: '.html' //视图文件后缀名
+        , pageTabs: false //是否开启页面选项卡功能。单页版不推荐开启
+        , name: '大脑课堂管理系统'
+        , tableName: 'layuiAdmin' //本地存储表名
+        , MOD_NAME: 'admin' //模块事件名
+        , debug: true //是否开启调试模式。如开启，接口异常时会抛出异常 URL 等信息
+        , interceptor: true //是否开启未登入拦截
+        //自定义请求字段
+        , request: {
+            tokenName: 'access_token' //自动携带 token 的字段名。可设置 false 不携带。
+        }
+        //自定义响应字段
+        , response: {
+            statusName: 'code' //数据状态的字段名称
+            , statusCode: {
+                ok: 0 //数据状态一切正常的状态码
+                , logout: 1001 //登录状态失效的状态码
+            }
+            , msgName: 'msg' //状态信息的字段名称
+            , dataName: 'data' //数据详情的字段名称
+        }
+
+        /*
+        //独立页面路由，即无需登录页面，目前管理系统中不存在这样的页面，可随意添加（无需写参数）
+        */
+        , indPage: [
+
+        ]
+
+        //扩展的第三方模块
+        , extend: [
+            'echarts', //echarts 核心包
+            'echartsTheme', //echarts 主题
+        ]
+
+        //主题配置
+        , theme: {
+            //内置主题配色方案
+            color: [{
+                main: '#20222A' //主题色
+                , selected: '#009688' //选中色
+                , alias: 'default' //默认别名
+            }, {
+                main: '#03152A'
+                , selected: '#3B91FF'
+                , alias: 'dark-blue' //藏蓝
+            }, {
+                main: '#2E241B'
+                , selected: '#A48566'
+                , alias: 'coffee' //咖啡
+            }, {
+                main: '#50314F'
+                , selected: '#7A4D7B'
+                , alias: 'purple-red' //紫红
+            }, {
+                main: '#344058'
+                , logo: '#1E9FFF'
+                , selected: '#1E9FFF'
+                , alias: 'ocean' //海洋
+            }, {
+                main: '#3A3D49'
+                , logo: '#2F9688'
+                , selected: '#5FB878'
+                , alias: 'green' //墨绿
+            }, {
+                main: '#20222A'
+                , logo: '#F78400'
+                , selected: '#F78400'
+                , alias: 'red' //橙色
+            }, {
+                main: '#28333E'
+                , logo: '#AA3130'
+                , selected: '#AA3130'
+                , alias: 'fashion-red' //时尚红
+            }, {
+                main: '#24262F'
+                , logo: '#3A3D49'
+                , selected: '#009688'
+                , alias: 'classic-black' //经典黑
+            }, {
+                logo: '#226A62'
+                , header: '#2F9688'
+                , alias: 'green-header' //墨绿头
+            }, {
+                main: '#344058'
+                , logo: '#0085E8'
+                , selected: '#1E9FFF'
+                , header: '#1E9FFF'
+                , alias: 'ocean-header' //海洋头
+            }, {
+                header: '#393D49'
+                , alias: 'classic-black-header' //经典黑
+            }, {
+                main: '#50314F'
+                , logo: '#50314F'
+                , selected: '#7A4D7B'
+                , header: '#50314F'
+                , alias: 'purple-red-header' //紫红头
+            }, {
+                main: '#28333E'
+                , logo: '#28333E'
+                , selected: '#AA3130'
+                , header: '#AA3130'
+                , alias: 'fashion-red-header' //时尚红头
+            }, {
+                main: '#28333E'
+                , logo: '#009688'
+                , selected: '#009688'
+                , header: '#009688'
+                , alias: 'green-header' //墨绿头
+            }]
+            //初始的颜色索引，对应上面的配色方案数组索引
+            //如果本地已经有主题色记录，则以本地记录为优先，除非请求本地数据（localStorage）
+            , initColorIndex: 0
+        }
+        , apiAddress: {
+            region: {
+                loadchilds: apiGatewayAddress + '/api/user/region/loadchilds',
+                getnumber: apiGatewayAddress + '/api/user/region/getnumber'
+            },
+            organization: {
+                list: apiGatewayAddress + '/api/user/organization/pagelist',
+                loadall: apiGatewayAddress + '/api/user/organization/loadall',
+                add: apiGatewayAddress + '/api/user/organization/add',
+                updatestatus: apiGatewayAddress + '/api/user/organization/updatestatus',
+                update: apiGatewayAddress + '/api/user/organization/update',
+                detail: apiGatewayAddress + '/api/user/organization/detail'
+            },
+            classes: {
+                pagelist: apiGatewayAddress + '/api/user/classes/pagelist',
+                list: apiGatewayAddress + '/api/user/classes/list',
+                add: apiGatewayAddress + '/api/user/classes/add',
+                delete: apiGatewayAddress + '/api/user/classes/delete',
+                update: apiGatewayAddress + '/api/user/classes/update'
+            },
+            userprofile: {
+                list: apiGatewayAddress + '/api/user/userprofile/pagelist',
+                add: apiGatewayAddress + '/api/user/userprofile/add',
+                updatestatus: apiGatewayAddress + '/api/user/userprofile/updatestatus',
+                update: apiGatewayAddress + '/api/user/userprofile/update',
+                getuserswithaccount: apiGatewayAddress + '/api/user/userprofile/getuserswithaccount',
+                uploadfile: apiGatewayAddress + "/api/user/importuser/upload",
+                getimporttemplate: apiGatewayAddress + "/api/user/importuser/getimporttemplate",
+                getimportresult: apiGatewayAddress + '/api/user/importuser/getimportresult',
+                detail: apiGatewayAddress + '/api/user/userprofile/detail',
+                getnumber: apiGatewayAddress + '/api/user/userprofile/getnumber'
+            },
+            course: {
+                pagelist: apiGatewayAddress + '/api/content/course/pagelist',
+                add: apiGatewayAddress + '/api/content/course/add',
+                detail: apiGatewayAddress + '/api/content/course/detail',
+                update: apiGatewayAddress + '/api/content/course/update',
+                updatestatus: apiGatewayAddress + '/api/content/course/updatestatus',
+                projectconfigpagelist: apiGatewayAddress + '/api/content/course/projectconfigpagelist',
+                loadall: apiGatewayAddress + '/api/content/course/loadall'
+            },
+            childrencourse: {
+                list: apiGatewayAddress + '/api/content/coursechild/pagelist',
+                add: apiGatewayAddress + '/api/content/coursechild/add',
+                update: apiGatewayAddress + '/api/content/coursechild/update',
+                updatestatus: apiGatewayAddress + '/api/content/coursechild/updatestatus',
+                loadall: apiGatewayAddress + '/api/content/coursechild/loadall'
+            },
+            coursechildconfig: {
+                addconfig: apiGatewayAddress + '/api/content/coursechildconfig/addconfig',
+                list: apiGatewayAddress + '/api/content/coursechildconfig/configlist',
+                deleteconfig: apiGatewayAddress + '/api/content/coursechildconfig/deleteconfig',
+                configweight: apiGatewayAddress + '/api/content/coursechildconfig/getconfigsetting',
+                addweight: apiGatewayAddress + '/api/content/coursechildconfig/updateweight',
+                getnumber: apiGatewayAddress + '/api/content/coursechildconfig/getnumber',
+                getcountnumber: apiGatewayAddress + '/api/content/coursechildconfig/getcountnumber',
+                updatedispayorder: apiGatewayAddress + '/api/content/coursechildconfig/updatedisplayorder',
+                setexecutionsnumber: apiGatewayAddress + '/api/content/coursechildconfig/setexecutionsnumber'
+            },
+            projects: {
+                list: apiGatewayAddress + '/api/content/projects/pagelist',
+                search: apiGatewayAddress + '/api/content/projects/search',
+                add: apiGatewayAddress + '/api/content/projects/add',
+                updatestatus: apiGatewayAddress + '/api/content/projects/updatestatus',
+                update: apiGatewayAddress + '/api/content/projects/update'
+            },
+            projectcourseuser: {
+                list: apiGatewayAddress + '/api/content/projectcoursechilduser/pagelist',
+                add: apiGatewayAddress + '/api/content/projectcoursechilduser/add',
+                checkcourescode: apiGatewayAddress + '/api/content/projectcoursechilduser/checkcourescode',
+                delete: apiGatewayAddress + '/api/content/projectcoursechilduser/delete',
+                updatecoursecode: apiGatewayAddress + '/api/content/projectcoursechilduser/updatecoursecode',
+                usercourse: apiGatewayAddress + '/api/content/projectcoursechilduser/getcoursebyuserid',
+                usercoursechild: apiGatewayAddress + '/api/content/projectcoursechilduser/getcoursechildbyuserid',
+            },
+            projectcourseconfig: {
+                list: apiGatewayAddress + '/api/content/projectcourseconfig/pagelist',
+                add: apiGatewayAddress + '/api/content/projectcourseconfig/add',
+                delete: apiGatewayAddress + '/api/content/projectcourseconfig/delete',
+                updateisenable: apiGatewayAddress + '/api/content/projectcourseconfig/updateisenable',
+                updateisfinished: apiGatewayAddress + '/api/content/projectcourseconfig/updateisfinished',
+                loadall: apiGatewayAddress + '/api/content/projectcourseconfig/getprojectcoursebyid'
+            },
+            projectcoursechild: {
+                list: apiGatewayAddress + '/api/content/projectcoursechild/pagelist',
+                updateisenable: apiGatewayAddress + '/api/content/projectcoursechild/updateisenable',
+                updateisfinished: apiGatewayAddress + '/api/content/projectcoursechild/updateisfinished'
+            },
+            coursecode: {
+                list: apiGatewayAddress + '/api/content/projectcoursechild/pagelist',
+                add: apiGatewayAddress + '/api/content/projectcoursechild/add',
+                update: apiGatewayAddress + '/api/content/projectcoursechild/update',
+                checkmodel: apiGatewayAddress + '/api/content/projectcoursechild/checkmodel'
+            },
+            calculatecode: {
+                list: apiGatewayAddress + '/api/content/calculatecode/pagelist',
+                add: apiGatewayAddress + '/api/content/calculatecode/add',
+                delete: apiGatewayAddress + '/api/content/calculatecode/delete',
+                update: apiGatewayAddress + '/api/content/calculatecode/update',
+                loadall: apiGatewayAddress + '/api/content/calculatecode/loadall'
+            },
+            ability: {
+                list: apiGatewayAddress + '/api/content/ability/pagelist',
+                add: apiGatewayAddress + '/api/content/ability/add',
+                delete: apiGatewayAddress + '/api/content/ability/delete',
+                update: apiGatewayAddress + '/api/content/ability/update',
+                detail: apiGatewayAddress + '/api/content/ability/detail',
+                selname: apiGatewayAddress + '/api/content/ability/loadall',
+                seltree: apiGatewayAddress + '/api/content/ability/loadallsel',
+                updatestatus: apiGatewayAddress + '/api/content/ability/updatestatus',
+                upload: apiGatewayAddress + '/api/content/ability/upload',
+                getnumber: apiGatewayAddress + '/api/content/ability/getnumber'
+            },
+            evaluationgame: {
+                list: apiGatewayAddress + '/api/content/evaluationgames/pagelist',
+                add: apiGatewayAddress + '/api/content/evaluationgames/add',
+                delete: apiGatewayAddress + '/api/content/evaluationgames/delete',
+                update: apiGatewayAddress + '/api/content/evaluationgames/update',
+                detail: apiGatewayAddress + '/api/content/evaluationgames/detail',
+                updatestatus: apiGatewayAddress + '/api/content/evaluationgames/updatestatus'
+            },
+            traingame: {
+                list: apiGatewayAddress + '/api/content/traingame/pagelist',
+                add: apiGatewayAddress + '/api/content/traingame/add',
+                delete: apiGatewayAddress + '/api/content/traingame/delete',
+                update: apiGatewayAddress + '/api/content/traingame/update',
+                detail: apiGatewayAddress + '/api/content/traingame/detail',
+                updatestatus: apiGatewayAddress + '/api/content/traingame/updatestatus'
+            },
+            checkpointheader: {
+                list: apiGatewayAddress + '/api/content/traingamecheckpointheader/getlist',
+                add: apiGatewayAddress + '/api/content/traingamecheckpointheader/add',
+                delete: apiGatewayAddress + '/api/content/traingamecheckpointheader/delete',
+            },
+            checkpointconfig: {
+                pagelist: apiGatewayAddress + '/api/content/traingamecheckpointconfig/pagelist',
+                add: apiGatewayAddress + '/api/content/traingamecheckpointconfig/add',
+                delete: apiGatewayAddress + '/api/content/traingamecheckpointconfig/delete',
+                loadallbytaingameid: apiGatewayAddress + '/api/content/traingamecheckpointconfig/loadallbytaingameid',
+                exportconfigdata: apiGatewayAddress + '/api/content/traingamelevelmanage/exportconfigdata',
+                importconfigdata: apiGatewayAddress + '/api/content/traingamelevelmanage/importconfigdata',
+                getlevels: apiGatewayAddress + "/api/content/traingamelevelmanage/getlevels",
+                defaultlevelsettings: apiGatewayAddress + "/api/content/traingamelevelmanage/defaultlevelsettings",
+            },
+            // traingamelevelmanage: {
+            //     exportconfigdata: apiGatewayAddress + '/api/content/traingamelevelmanage/exportconfigdata',
+            //     importconfigdata: apiGatewayAddress + '/api/content/traingamelevelmanage/importconfigdata',
+            //     getlevels: apiGatewayAddress + "/api/content/traingamelevelmanage/getlevels",
+            //     defaultlevelsettings: apiGatewayAddress + "/api/content/traingamelevelmanage/defaultlevelsettings",
+            // },
+            normconfig: {
+                list: apiGatewayAddress + "/api/content/normconfig/pagelist",
+                delete: apiGatewayAddress + "/api/content/normconfig/delete",
+                getimporttemplate: apiGatewayAddress + '/api/content/normconfig/getimporttemplate',
+                uploadfile: apiGatewayAddress + '/api/content/normconfig/upload',
+                getimportresult: apiGatewayAddress + '/api/content/normconfig/getimportresult',
+                updatedefaultnorm: apiGatewayAddress + '/api/content/normconfig/updatedefaultnorm',
+                getexporttemplate: apiGatewayAddress + '/api/content/normconfig/getexporttemplate',
+            },
+            questiongroup: {
+                pagelist: apiGatewayAddress + '/api/content/questiongroup/pagelist',
+                add: apiGatewayAddress + '/api/content/questiongroup/add',
+                delete: apiGatewayAddress + '/api/content/questiongroup/delete',
+                update: apiGatewayAddress + '/api/content/questiongroup/update',
+                detail: apiGatewayAddress + '/api/content/questiongroup/detail',
+                updatestatus: apiGatewayAddress + '/api/content/questiongroup/updatestatus',
+                questionbyidlist: apiGatewayAddress + '/api/content/questiongroup/getquestionbyidlist',
+                addquestionconfig: apiGatewayAddress + '/api/content/questiongroup/addquestionconfig',
+                deleteconfig: apiGatewayAddress + '/api/content/questiongroup/deletequertionconfig',
+                updateorder: apiGatewayAddress + '/api/content/questiongroup/updateorder',
+                deleteconfigs: apiGatewayAddress + '/api/content/questiongroup/deletequertionconfig'
+            },
+            question: {
+                pagelist: apiGatewayAddress + '/api/content/questions/pagelist',
+                add: apiGatewayAddress + '/api/content/questions/add',
+                delete: apiGatewayAddress + '/api/content/questions/delete',
+                update: apiGatewayAddress + '/api/content/questions/update',
+                detail: apiGatewayAddress + '/api/content/questions/detail',
+                updatestatus: apiGatewayAddress + '/api/content/questions/updatestatus',
+                gettemplate: apiGatewayAddress + '/api/content/questions/getimporttemplate',
+                upload: apiGatewayAddress + '/api/content/questions/upload',
+                getimportresult: apiGatewayAddress + '/api/content/questions/getimportresult'
+            },
+            image: {
+                imageupload: "http://192.168.0.172:8006/api/file/upload",
+                imageeditupload: 'http://192.168.0.172:8006/api/file/richtextupload'
+            },
+            client: {
+                list: apiGatewayAddress + '/api/sysconfig/clients/list',
+                add: apiGatewayAddress + "/api/sysconfig/clients/add",
+                update: apiGatewayAddress + "/api/sysconfig/clients/update",
+                delete: apiGatewayAddress + "/api/sysconfig/clients/delete",
+                secret: apiGatewayAddress + "/api/sysconfig/clients/clientsecretlist",
+                secretadd: apiGatewayAddress + "/api/sysconfig/clients/addclientsecret",
+                secretdel: apiGatewayAddress + "/api/sysconfig/clients/deletesecret",
+                redirecturis: apiGatewayAddress + "/api/sysconfig/clients/clientredirecturilist",
+                redirecturisadd: apiGatewayAddress + "/api/sysconfig/clients/addredirecturi",
+                redirecturisdel: apiGatewayAddress + "/api/clients/deleteredirecturi",
+                logouturis: apiGatewayAddress + "/api/sysconfig/clients/clientlogouturilist",
+                logouturisadd: apiGatewayAddress + "/api/sysconfig/clients/addlogouturi",
+                logouturisdel: apiGatewayAddress + "/api/sysconfig/clients/deletelogouturi",
+                scopes: apiGatewayAddress + "/api/sysconfig/clients/clientscopelist",
+                scopesadd: apiGatewayAddress + "/api/sysconfig/clients/addclientscope",
+                scopesdel: apiGatewayAddress + "/api/sysconfig/clients/deletescope",
+                corsorigins: apiGatewayAddress + "/api/sysconfig/clients/clientcorslist",
+                corsoriginsadd: apiGatewayAddress + "/api/sysconfig/clients/addclientcorsorigin",
+                corsoriginsdel: apiGatewayAddress + "/api/sysconfig/clients/deletecorsorigin",
+            },
+            identityresource: {
+                list: apiGatewayAddress + "/api/sysconfig/identityresource/list",
+                claims: apiGatewayAddress + "/api/sysconfig/identityresource/claims",
+            },
+            apiresource: {
+                apiresourcelist: apiGatewayAddress + "/api/sysconfig/apiresource/apiresourcelist",
+                addapiresource: apiGatewayAddress + "/api/sysconfig/apiresource/addapiresource",
+                updateapiresource: apiGatewayAddress + "/api/sysconfig/apiresource/updateapiresource",
+                apisecretlist: apiGatewayAddress + "/api/sysconfig/apiresource/apisecretlist",
+                addapisecret: apiGatewayAddress + "/api/sysconfig/apiresource/addapisecret",
+                deleteapisecret: apiGatewayAddress + "/api/sysconfig/apiresource/deleteapisecret",
+                apiscopelist: apiGatewayAddress + "/api/sysconfig/apiscope/apiscopelist",
+                addapiscope: apiGatewayAddress + "/api/sysconfig/apiscope/addapiscope",
+                deleteapiscope: apiGatewayAddress + "/api/sysconfig/apiscope/deleteapiscope",
+                apiresourceclaimslist: apiGatewayAddress + "/api/sysconfig/apiresource/apiresourceclaimslist",
+                addapiresourceclaims: apiGatewayAddress + "/api/sysconfig/apiresource/addapiresourceclaims",
+                deleteapiresourceclaims: apiGatewayAddress + "/api/sysconfig/apiresource/deleteapiresourceclaims",
+            },
+            clientmodules: {
+                list: apiGatewayAddress + "/api/sysconfig/clientmodules/list",
+                add: apiGatewayAddress + "/api/sysconfig/clientmodules/add",
+                delete: apiGatewayAddress + "/api/sysconfig/clientmodules/delete",
+                update: apiGatewayAddress + "/api/sysconfig/clientmodules/update",
+                treelist: apiGatewayAddress + "/api/sysconfig/clientmodules/treelist",
+                roletreelist: apiGatewayAddress + "/api/sysconfig/clientmodules/roletreelist",
+                updatestatus: apiGatewayAddress + "/api/sysconfig/clientmodules/updatestatus"
+            },
+            modulebuttons: {
+                list: apiGatewayAddress + "/api/sysconfig/modulebuttons/list",
+                loadall: apiGatewayAddress + "/api/sysconfig/modulebuttons/loadall",
+                add: apiGatewayAddress + "/api/sysconfig/modulebuttons/add",
+                delete: apiGatewayAddress + "/api/sysconfig/modulebuttons/delete",
+                update: apiGatewayAddress + "/api/sysconfig/modulebuttons/update",
+            },
+            gateway: {
+                list: apiGatewayAddress + '/api/sysconfig/gatewaysettings/list',
+                add: apiGatewayAddress + "/api/sysconfig/gatewaysettings/add",
+                update: apiGatewayAddress + "/api/sysconfig/gatewaysettings/update",
+                delete: apiGatewayAddress + "/api/sysconfig/gatewaysettings/delete",
+                detail: apiGatewayAddress + "/api/sysconfig/gatewaysettings/detail"
+            },
+            reroute: {
+                list: apiGatewayAddress + '/api/sysconfig/reroute/list',
+                add: apiGatewayAddress + "/api/sysconfig/reroute/add",
+                update: apiGatewayAddress + "/api/sysconfig/reroute/update",
+                delete: apiGatewayAddress + "/api/sysconfig/reroute/delete",
+                detail: apiGatewayAddress + "/api/sysconfig/reroute/detail"
+            },
+            adminuser: {
+                list: apiGatewayAddress + '/api/sysconfig/identityuser/pagelist',
+                add: apiGatewayAddress + "/api/sysconfig/identityuser/add",
+                update: apiGatewayAddress + "/api/sysconfig/identityuser/update",
+                updatestatus: apiGatewayAddress + "/api/sysconfig/identityuser/updatestatus",
+                updatepassword: apiGatewayAddress + "/api/sysconfig/identityuser/updatepassword",
+                detail: apiGatewayAddress + "/api/sysconfig/identityuser/detail"
+            },
+            roles: {
+                pagelist: apiGatewayAddress + '/api/sysconfig/aspnetrole/pagelist',
+                list: apiGatewayAddress + "/api/sysconfig/aspnetrole/list",
+                add: apiGatewayAddress + "/api/sysconfig/aspnetrole/add",
+                edit: apiGatewayAddress + "/api/sysconfig/aspnetrole/update"
+            },
+            roleclaims: {
+                list: apiGatewayAddress + '/api/sysconfig/aspnetroleclaims/list',
+            },
+            rolepermission: {
+                loadsettings: apiGatewayAddress + "/api/sysconfig/aspnetrolepermission/loadsettings",
+                list: apiGatewayAddress + "/api/sysconfig/aspnetrolepermission/list",
+                settings: apiGatewayAddress + "/api/sysconfig/aspnetrolepermission/settings",
+            },
+            abilityclass: {
+                pagelist: apiGatewayAddress + '/api/report/abilityclass/pagelist',
+                add: apiGatewayAddress + "/api/report/abilityclass/add",
+                detail: apiGatewayAddress + "/api/report/abilityclass/detail",
+                update: apiGatewayAddress + "/api/report/abilityclass/update",
+                loadall: apiGatewayAddress + "/api/report/abilityclass/list",
+                delete: apiGatewayAddress + "/api/report/abilityclass/delete"
+            },
+            comprehensiveabilityclass: {
+                pagelist: apiGatewayAddress + '/api/report/comprehensiveabilityclass/pagelist',
+                add: apiGatewayAddress + "/api/report/comprehensiveabilityclass/add",
+                detail: apiGatewayAddress + "/api/report/comprehensiveabilityclass/detail",
+                update: apiGatewayAddress + "/api/report/comprehensiveabilityclass/update"
+            },
+            comprehensiveability: {
+                pagelist: apiGatewayAddress + '/api/report/comprehensiveability/pagelist',
+                add: apiGatewayAddress + "/api/report/comprehensiveability/add",
+                detail: apiGatewayAddress + "/api/report/comprehensiveability/detail",
+                update: apiGatewayAddress + "/api/report/comprehensiveability/update",
+                delete: apiGatewayAddress + "/api/report/comprehensiveability/delete",
+                loadall: apiGatewayAddress + "/api/report/comprehensiveability/loadall"
+            },
+            abilityreference: {
+                pagelist: apiGatewayAddress + '/api/report/abilityreference/pagelist',
+                add: apiGatewayAddress + "/api/report/abilityreference/add",
+                detail: apiGatewayAddress + "/api/report/abilityreference/detail",
+                delete: apiGatewayAddress + "/api/report/abilityreference/delete",
+                edit: apiGatewayAddress + "/api/report/abilityreference/update"
+            },
+            courseresult: {
+                pagelist: apiGatewayAddress + '/api/report/courseresult/pagelist',
+                generateReport: apiGatewayAddress + '/api/report/report/'
+            },
+            questiongrouptemplate: {
+                list: apiGatewayAddress + '/api/content/questiongrouptemplate/pagelist',
+                add: apiGatewayAddress + '/api/content/questiongrouptemplate/add',
+                update: apiGatewayAddress + '/api/content/questiongrouptemplate/update',
+                updatestatus: apiGatewayAddress + '/api/content/questiongrouptemplate/updatestatus',
+                loadall: apiGatewayAddress + '/api/content/questiongrouptemplate/loadall'
+            },
+            reporttemplate: {
+                list: apiGatewayAddress + '/api/content/reporttemplate/pagelist',
+                add: apiGatewayAddress + '/api/content/reporttemplate/add',
+                update: apiGatewayAddress + '/api/content/reporttemplate/update',
+                detail: apiGatewayAddress + '/api/content/reporttemplate/detail',
+                loadall: apiGatewayAddress + '/api/content/reporttemplate/loadall',
+                updatestatus: apiGatewayAddress + "/api/content/reporttemplate/updatestatus",
+            },
+            reportconfig: {
+                list: apiGatewayAddress + '/api/content/reportconfig/pagelist',
+                add: apiGatewayAddress + '/api/content/reportconfig/add',
+                update: apiGatewayAddress + '/api/content/reportconfig/update',
+                detail: apiGatewayAddress + '/api/content/reportconfig/detail',
+                updateisdefault: apiGatewayAddress + "/api/content/reportconfig/updateisdefault"
+            },
+            templatetype: {
+                list: apiGatewayAddress + '/api/content/reporttemplatetype/pagelist',
+                add: apiGatewayAddress + '/api/content/reporttemplatetype/add',
+                update: apiGatewayAddress + '/api/content/reporttemplatetype/update',
+                loadall: apiGatewayAddress + '/api/content/reporttemplatetype/loadall',
+                delete: apiGatewayAddress + "/api/content/reporttemplatetype/delete"
+            },
+            courseresultreport: {
+                preview: apiGatewayAddress + '/api/data/courseresultreport/previewreport',
+                checkdownload: apiGatewayAddress + '/api/data/courseresultreport/checkdownloadreport',
+                downloadbatch: apiGatewayAddress + '/api/data/courseresultreport/downloadreportbatch'
+            },
+            SysApplication: {
+              loadall: apiGatewayAddress + '/api/usercenter/SysApplication/loadall',
+              add: apiGatewayAddress + '/api/usercenter/SysApplication/add',
+              updata: apiGatewayAddress + '/api/usercenter/SysApplication/update',
+              updatestatus: apiGatewayAddress + '/api/usercenter/SysApplication/updatestatus',
+              delete: apiGatewayAddress + '/api/usercenter/SysApplication/delete',
+            }
+        }
+    });
+});

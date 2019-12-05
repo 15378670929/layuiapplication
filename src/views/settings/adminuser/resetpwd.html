@@ -1,0 +1,32 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="resetpwd-form" lay-filter="resetpwd-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                <input type="text" name="UserName" value="{{ d.params.userName || '' }}" placeholder="" lay-verify="required|normallength" readonly="readonly" autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" name="PhoneNumber" value="{{ d.params.phoneNumber || '' }}" placeholder="" lay-verify="required|normallength" readonly="readonly" autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block ">
+            <input type="password" id="Password" name="Password" lay-verify="required|password" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="resetpwd-form-submit" lay-submit="resetpwd-form-submit">保存</button>
+    </div>
+</form>

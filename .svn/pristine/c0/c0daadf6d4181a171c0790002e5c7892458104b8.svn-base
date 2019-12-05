@@ -1,0 +1,130 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="questiongroup-add-form" lay-filter="questiongroup-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-inline ">
+            <input type="text" id="Name" name="Name" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+        <label class="layui-form-label">模板</label>
+        <div class="layui-input-inline">
+            <select id="grouptemplateId" name="GrouptemplateId" lay-verify="required|select"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">科学名称</label>
+        <div class="layui-input-inline ">
+            <input type="text" id="scientificName" name="ScientificName" lay-verify="required|username" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+        <label class="layui-form-label">完成方式</label>
+        <div class="layui-input-inline">
+            <select id="finishType" name="FinishType" lay-verify="required|select">
+                <option value="">请选择</option>
+                <option value="1">限时</option>
+                <option value="2">不限时</option>
+                <option value="3">随时提交</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">算分码</label>
+        <div class="layui-input-inline">
+            <select id="code" name="" lay-verify="required|select" lay-filter="codefilter">
+                <option value="">请选择</option>
+            </select>
+            <input type="hidden" id="calculateCode" name="ExerciseCalculateCode" lay-verify="required" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+        <label class="layui-form-label">版本</label>
+        <div class="layui-input-inline ">
+            <input type="text" id="Version" name="Version" lay-verify="required|versions" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">年龄范围</label>
+        <div class="layui-input-inline ">
+            <input type="text" id="minAge" name="MinAge" lay-verify="required|number|age|positive" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+        <div class="layui-input-inline ">
+            <input type="text" id="maxAge" name="MaxAge" lay-verify="required|number|positive" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">能力类型</label>
+        <div class="layui-input-inline">
+            <select id="abilityType" name="AbilityTypeId" lay-verify="required|select" lay-filter="abilityType-filter"></select>
+        </div>
+        <div class="layui-input-inline">
+            <select id="firstAbilities" name="FirstAbilityId" lay-verify="required|select" lay-filter="firstAbilities-filter"></select>
+        </div>
+        <div class="layui-input-inline">
+            <select id="secondAbilities" name="SecondAbilityId" lay-verify="required|select"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结束时长</label>
+        <div class="layui-input-inline">
+            <input type="text" readonly="readonly" placeholder="HH:mm:ss" name="EndTime" id="endTime" lay-verify="required" class="layui-input">
+        </div>
+        <label class="layui-form-label">取题数量</label>
+        <div class="layui-input-inline">
+            <input type="text" id="QuestionNum" name="PushQuestionNum" lay-verify="required|mainnumber" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div class="layui-form-item">
+            <label class="layui-form-label">Icon</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal" id="uploadicon"><i class="layui-icon"></i>上传图片</button>
+                <div class="layui-inline layui-word-aux">
+                    上传图片大小为2M以内，格式为jpg、png
+                    <img class="layui-upload-img" id="showicon">
+                </div>
+                <input type="hidden" id="icon" name="Icon" lay-verify="" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div class="layui-form-item">
+            <label class="layui-form-label">Banner</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal" id="uploadcoverPlanUri"><i class="layui-icon"></i>上传图片</button>
+                <div class="layui-inline layui-word-aux">
+                    上传图片大小为2M以内，格式为jpg、png
+                    <img class="layui-upload-img" id="showcoverPlanUri">
+                </div>
+                <input type="hidden" id="coverPlanUri" name="CoverPlanUri" lay-verify="" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Status" value="true" title="启用" checked>
+            <input type="radio" name="Status" value="false" title="禁用">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <input type="radio" name="OrderType" value="1" title="随机" checked>
+            <input type="radio" name="OrderType" value="2" title="手动">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">粗分说明</label>
+        <div class="layui-input-block ">
+            <textarea placeholder="" lay-verify="required" class="layui-textarea" id="roughDescription" name="RoughDescription"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <!-- <label class="layui-form-label">描述</label> -->
+        <div class="layui-input-block ">
+            <textarea placeholder="请输入描述" maxlength="300" lay-verify="required" class="layui-textarea" id="remark" name="Remark"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="questiongroup-add-form-submit" lay-submit="questiongroup-add-form-submit">保存</button>
+    </div>
+</form>

@@ -1,0 +1,105 @@
+﻿/**
+ @Name：算分码管理
+ */
+layui.define(['table', 'form', 'common', 'setter'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , form = layui.form;
+
+    table.render({
+        elem: '#calculatecode-table'
+        , url: setter.apiAddress.calculatecode.list
+        , cols: [[//表格列数据渲染
+            { field: 'code', title: '算分码' },
+            { field: 'description', title: '说明' },
+            { 
+                field: 'relateGame', title: '关联游戏/题目壳',templet: function(d){
+                    if(d.relateGame){
+                        var newArrays = JSON.parse(d.relateGame);
+                        if(newArrays.length == 1){
+                            return newArrays[0].Name;
+                        }else if(newArrays.length > 1){
+                            var dataArray = [];
+                            for(var i = 0;i<newArrays.length;i++){
+                                dataArray.push(newArrays[i].Name);
+                            }
+                            return dataArray.join('；');
+                        }
+                    }
+                    else{
+                        return "";
+                    }
+                }
+            },
+            {
+                field: 'createTime', title: '创建时间', sort: true, width: 150, templet: function (d) {
+                    return common.formatDate(d.createTime, "yyyy-MM-dd hh:mm:ss")
+                }
+            },
+            { title: '操作', width: 150, align: 'center', fixed: 'right', toolbar: '#table-operation-btn' }
+        ]]
+        , page: true
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.result.totalCount,
+                "data": res.result.items
+            };
+        }
+    });
+
+    //编辑&删除
+    table.on('tool(calculatecode-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'del') {
+            layer.confirm('确定删除？', function (index) {
+                if(!data.relateGame){
+                    common.ajax(setter.apiAddress.calculatecode.delete, "POST", "", { id: data.id }, function (res) {
+                        if (res.statusCode == 200) {
+                            layer.close(index);
+                            layui.table.reload('calculatecode-table');
+                        }
+                        layer.msg(res.message);
+                    });
+                }else{
+                    layer.msg('该课程码存在游戏使用,不允许删除!');
+                    layer.close(index);
+                }
+                
+            });
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑算分码信息'
+                , area: ['475px', '253px']
+                , resize: true
+                , success: function (layero, index) {
+                    view(this.id).render('content/calculatecode/edit', data).done(function () {
+                        form.on('submit(calculatecode-form-submit)', function (data) {
+                            common.ajax(setter.apiAddress.calculatecode.update, "POST", "", data.field, function (res) {
+                                if (res.statusCode == 200) {
+                                    layer.close(index);
+                                    table.reload('calculatecode-table');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    });
+    exports('calculatecode', {})
+});

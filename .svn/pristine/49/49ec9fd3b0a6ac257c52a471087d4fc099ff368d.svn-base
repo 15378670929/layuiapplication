@@ -1,0 +1,26 @@
+﻿<title>能力维度管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a><cite>能力维度</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="dicability-search">
+            <button class="layui-btn btn-dicability" data-type="add">添加</button>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="dicability-table" lay-filter="dicability-table"></table>
+
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('dicability', layui.factory('dicability')).use(['dicability'], function () {
+    });
+</script>

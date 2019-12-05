@@ -1,0 +1,411 @@
+/**
+ @Name：主页控制台
+ */
+layui.define(function (exports) {
+
+    /*
+      下面通过 layui.use 分段加载不同的模块，实现不同区域的同时渲染，从而保证视图的快速呈现
+    */
+
+    layui.use(['admin', 'carousel', 'oidcconfig', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , carousel = layui.carousel
+            , element = layui.element
+            , oidcconfig = layui.oidcconfig
+            , device = layui.device()
+            , common = layui.common
+            , layer = layui.layer
+            , setter = layui.setter;
+
+        $('.logout').on('click', function (event) {
+            event.preventDefault();
+            oidcconfig.signoutRedirect().catch(function (error) {
+                console.error('error while signing out user', error);
+            });
+        });
+
+        // 近一个月项目数量、近期一个月题目壳数量、近期一个月训练游戏数量、近期一个月测评游戏数量、近一个月内容数量
+        common.ajax(setter.apiAddress.coursechildconfig.getcountnumber, "GET", "", '', function (res) {
+            if (res.statusCode == 200) {
+                $('#projectCount').html(res.result.projectcount)
+                $('#projectMonthCount').html(res.result.projectdatamonth)
+                $('#questionGroupCount').html(res.result.questionGroupscount)
+                $('#questionGroupMonthCount').html(res.result.questionGroupsndatamonth)
+                $('#trainingGamesCount').html(res.result.trainGamescount)
+                $('#trainingGamesMonthCount').html(res.result.trainGamesdatamonth)
+                $('#evaluateGameCount').html(res.result.evaluationGamescount)
+                $('#evaluateGameMonthCount').html(res.result.evaluationGamesdatamonth)
+                $('#questionsCount').html(res.result.questioncount)
+                $('#questionsMonthCount').html(res.result.questiondatamonth)
+
+                // 近一个月内容数量
+                var contentCount = res.result.questionGroupscount + res.result.trainGamescount + res.result.evaluationGamescount
+                var contentMonthCount = res.result.questionGroupsndatamonth + res.result.trainGamesdatamonth + res.result.evaluationGamesdatamonth
+                $('#contentCount').html(contentCount)
+                $('#contentMonthCount').html(contentMonthCount)
+            }
+        }, function (error) {
+            layer.msg(error.msg);
+        });
+
+        // 获取近期一个月用户数量和近一个月机构数量
+        common.ajax(setter.apiAddress.userprofile.getnumber, "GET", "", '', function (res) {
+            if (res.statusCode == 200) {
+                $('#organizationCount').html(res.result.organizationcount)
+                $('#organizationMonthCount').html(res.result.organizationmonthcount)
+                $('#userCount').html(res.result.usercount)
+                $('#userMonthCount').html(res.result.usermonthcount)
+            }
+        }, function (error) {
+            layer.msg(error.msg);
+        });
+    });
+
+    //区块轮播切换
+    layui.use(['admin', 'carousel'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , carousel = layui.carousel
+            , element = layui.element
+            , device = layui.device();
+
+        //轮播切换
+        $('.layadmin-carousel').each(function () {
+            var othis = $(this);
+            carousel.render({
+                elem: this
+                , width: '100%'
+                , arrow: 'none'
+                , interval: othis.data('interval')
+                , autoplay: othis.data('autoplay') === true
+                , trigger: (device.ios || device.android) ? 'click' : 'hover'
+                , anim: othis.data('anim')
+            });
+        });
+        element.render('progress');
+    });
+
+
+    //数据概览
+    layui.use(['admin', 'carousel', 'echarts', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , carousel = layui.carousel
+            , echarts = layui.echarts
+            , common = layui.common
+            , setter = layui.setter
+            , layer = layui.layer
+
+        // 获取內容数量
+        common.ajax(setter.apiAddress.coursechildconfig.getnumber, "GET", "", '', function (res) {
+            if (res.statusCode == 200) {
+                var echartsApp = [], options = [
+                    // 饼图
+                    {
+                        title: {
+                            text: '测评游戏、训练游戏、题目壳总数统计',
+                            textStyle: {
+                                fontFamily: 'serif'
+                            }
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            axisPointer: {
+                                type: 'shadow'
+                            }
+                        },
+                        legend: {
+                            data: ['2019年']
+                        },
+                        grid: {
+                            left: '3%',
+                            right: '4%',
+                            bottom: '3%',
+                            containLabel: true
+                        },
+                        xAxis: {
+                            type: 'value',
+                            boundaryGap: [0, 0.01]
+                        },
+                        yAxis: {
+                            type: 'category',
+                            data: ['测评游戏', '题目壳', '训练游戏']
+                        },
+                        series: [
+                            {
+                                name: '2019年',
+                                type: 'bar',
+                                data: Object.values(res.result)
+                            }
+                        ]
+                    },
+                    //访客浏览器分布
+                    {
+                        title: {
+                            text: '',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: ['测评游戏', '题目壳', '训练游戏']
+                        },
+                        series: [
+                            {
+                                name: '访问来源',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: [
+                                    { value: Object.values(res.result)[0], name: '测评游戏' },
+                                    { value: Object.values(res.result)[1], name: '训练游戏' },
+                                    { value: Object.values(res.result)[2], name: '题目壳' },
+                                ],
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            }
+                        ]
+                    },
+                    //新增的用户量
+                    {
+                        title: {
+                            text: '最近一周新增的用户量',
+                            x: 'center',
+                            textStyle: {
+                                fontSize: 14
+                            }
+                        },
+                        tooltip: { //提示框
+                            trigger: 'axis',
+                            formatter: "{b}<br>新增用户：{c}"
+                        },
+                        xAxis: [{ //X轴
+                            type: 'category',
+                            data: ['11-07', '11-08', '11-09', '11-10', '11-11', '11-12', '11-13']
+                        }],
+                        yAxis: [{  //Y轴
+                            type: 'value'
+                        }],
+                        series: [{ //内容
+                            type: 'line',
+                            data: [200, 300, 400, 610, 150, 270, 380],
+                        }]
+                    }
+                ]
+                    , elemDataView = $('#LAY-index-dataview').children('div')
+                    , renderDataView = function (index) {
+                        echartsApp[index] = echarts.init(elemDataView[index], layui.echartsTheme);
+                        echartsApp[index].setOption(options[index]);
+                        //window.onresize = echartsApp[index].resize;
+                        admin.resize(function () {
+                            echartsApp[index].resize();
+                        });
+                    };
+                //没找到DOM，终止执行
+                if (!elemDataView[0]) return;
+                renderDataView(0);
+                //监听数据概览轮播
+                var carouselIndex = 0;
+                carousel.on('change(LAY-index-dataview)', function (obj) {
+                    renderDataView(carouselIndex = obj.index);
+                });
+                //监听侧边伸缩
+                layui.admin.on('side', function () {
+                    setTimeout(function () {
+                        renderDataView(carouselIndex);
+                    }, 300);
+                });
+                //监听路由
+                layui.admin.on('hash(tab)', function () {
+                    layui.router().path.join('') || renderDataView(carouselIndex);
+                });
+            }
+        }, function (error) {
+            layer.msg(error.msg);
+        });
+    });
+
+    //最新订单
+    layui.use('table', function () {
+        var $ = layui.$
+            , table = layui.table;
+        //今日热搜
+        table.render({
+            elem: '#LAY-index-topSearch'
+            , url: './json/console/top-search.js'
+            , page: true
+            , cols: [[
+                { type: 'numbers', fixed: 'left' }
+                , { field: 'keywords', title: '关键词', minWidth: 300, templet: '<div><a href="https://www.baidu.com/s?wd={{ d.keywords }}" target="_blank" class="layui-table-link">{{ d.keywords }}</div>' }
+                , { field: 'frequency', title: '搜索次数', minWidth: 120, sort: true }
+                , { field: 'userNums', title: '用户数', sort: true }
+            ]]
+            , skin: 'line'
+        });
+        //今日热贴
+        table.render({
+            elem: '#LAY-index-topCard'
+            , url: './json/console/top-card.js'
+            , page: true
+            , cellMinWidth: 120
+            , cols: [[
+                { type: 'numbers', fixed: 'left' }
+                , { field: 'title', title: '标题', minWidth: 300, templet: '<div><a href="{{ d.href }}" target="_blank" class="layui-table-link">{{ d.title }}</div>' }
+                , { field: 'username', title: '发帖者' }
+                , { field: 'channel', title: '类别' }
+                , { field: 'crt', title: '点击率', sort: true }
+            ]]
+            , skin: 'line'
+        });
+    });
+
+    //地图
+    layui.use(['carousel', 'echarts', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , carousel = layui.carousel
+            , echarts = layui.echarts
+            , common = layui.common
+            , setter = layui.setter
+            , layer = layui.layer;
+
+
+
+        // 获取近期一个月用户数量和近一个月机构数量
+        common.ajax(setter.apiAddress.region.getnumber, "GET", "", '', function (res) {
+            res.result.map(item => { 
+                if (item.name === '黑龙江省' || item.name === '内蒙古自治区') {
+                    item.name = item.name.slice(0,3)
+                } else {
+                    item.name = item.name.slice(0,2)
+                }
+                return item
+            })
+            if (res.statusCode == 200) {
+                var echartsApp = [], options = [
+                    {
+                        title: {
+                            text: '',
+                            subtext: '爱智游机构全国分布统计图'
+                        },
+                        tooltip: {
+                            trigger: 'item'
+                        },
+                        dataRange: {
+                            orient: 'horizontal',
+                            min: 0,
+                            max: 50,
+                            text: ['多', '少'],
+                            splitNumber: 0
+                        },
+                        series: [
+                            {
+                                name: '机构分布',
+                                type: 'map',
+                                mapType: 'china',
+                                selectedMode: 'multiple',
+                                itemStyle: {
+                                    normal: { label: { show: true } },
+                                    emphasis: { label: { show: true } }
+                                },
+                                data: res.result
+                            }
+                        ]
+                    }]
+                    , elemDataView = $('#LAY-index-pagethree').children('div')
+                    , renderDataView = function (index) {
+                        echartsApp[index] = echarts.init(elemDataView[index], layui.echartsTheme);
+                        echartsApp[index].setOption(options[index]);
+                        window.onresize = echartsApp[index].resize;
+                    };
+                //没找到DOM，终止执行
+                if (!elemDataView[0]) return;
+                renderDataView(0);
+            }
+        }, function (error) {
+            layer.msg(error.msg);
+        });
+    });
+
+    //能力维度
+    layui.use(['carousel', 'echarts', 'common', 'setter', 'layer'], function () {
+        var $ = layui.$
+            , carousel = layui.carousel
+            , echarts = layui.echarts
+            , common = layui.common
+            , setter = layui.setter
+            , layer = layui.layer;
+
+        common.ajax(setter.apiAddress.ability.getnumber, "GET", "", '', function (res) {
+            console.log(res)
+            if (res.statusCode == 200) {
+                var echartsApp = [], options = [
+                    {
+                        title: {
+                            subtext: '内容能力维度统计',
+                            textStyle: {
+                                fontSize: 14
+                            }
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                        },
+                        legend: {
+                            x: 'left',
+                            data: ['内容']
+                        },
+                        polar: [
+                            {
+                                indicator: res.result.result,
+                                radius: 130
+                            }
+                        ],
+                        series: [
+                            {
+                                type: 'radar',
+                                center: ['50%', '50%'],
+                                tooltip: {
+                                    trigger: 'item'
+                                },
+                                itemStyle: {
+                                    normal: {
+                                        areaStyle: {
+                                            type: 'default'
+                                        }
+                                    }
+                                },
+                                data: [
+                                    { 
+                                        value: res.result.value, 
+                                        name: '内容' 
+                                    }
+                                ]
+                            }
+                        ]
+                    }]
+                    , elemDataView = $('#LAY-index-pageone').children('div')
+                    , renderDataView = function (index) {
+                        echartsApp[index] = echarts.init(elemDataView[index], layui.echartsTheme);
+                        echartsApp[index].setOption(options[index]);
+                        window.onresize = echartsApp[index].resize;
+                    };
+                //没找到DOM，终止执行
+                if (!elemDataView[0]) return;
+                renderDataView(0);
+            }
+        }, function (error) {
+            layer.msg(error.msg);
+        });
+    });
+
+    exports('console', {})
+});

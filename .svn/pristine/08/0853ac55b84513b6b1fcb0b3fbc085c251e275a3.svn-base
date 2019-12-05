@@ -1,0 +1,80 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item" lay-filter="classes-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">能力名称</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                    <input type="text" name="Name" value="{{ d.params.name || '' }}" placeholder="" lay-verify="required" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">父能力</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="hidden" id="parentId" lay-verify="required|parentIdrepuired" name="ParentId" value="{{ d.params.parentId || '' }}" />
+                </script>
+                <input type="text" id="dicabilitytype-tree" required lay-filter="dicabilitytype-tree" readonly="" class="layui-input edittype-txt">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">能力等级</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="level" readonly="readonly" name="LevelNumber" value="{{ d.params.levelNumber || '0' }}" lay-verify="required" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">能力颜色</label>
+            <div class="layui-input-block" style="display:flex">
+                <script type="text/html" template>
+                    <input type="text" id="color" name="Color" readonly="readonly" value="{{ d.params.color || '' }}" placeholder="" lay-verify="required" autocomplete="off" class="layui-input">
+                </script>
+                <span id="abilitycolor"></span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">能力图标</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal" id="uploadicon"><i class="layui-icon"></i>上传图片</button>
+                <div class="layui-inline layui-word-aux">
+                    上传图片大小为2M以内，格式为jpg、png
+                </div>
+                <script type="text/html" template>
+                    {{# if(d.params.icon!=null&&d.params.icon!=""){ }}
+                    <img class="layui-upload-img" id="showicon" src="{{ d.params.icon || '' }}?x-oss-process=image/resize,h_50,w_50">
+                    {{# }else{ }}
+                    <img class="layui-upload-img" id="showicon">
+                    {{# } }}
+                    <input type="hidden" name="Icon" id="icon" value="{{ d.params.icon || '' }}" placeholder="" lay-verify="" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">短描述</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" name="ShortDescription" maxlength="20" value="{{ d.params.shortDescription || '' }}" lay-verify="" autocomplete="off" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">长描述</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+
+                    <textarea type="text" name="LongDescription" maxlength="150" lay-verify="" class="layui-textarea">{{ d.params.longDescription || '' }}</textarea>
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="dicability-form-submit">保存</button>
+        </div>
+    </div>
+</form>

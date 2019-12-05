@@ -1,0 +1,79 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item">
+        <label class="layui-form-label ">数据标识</label>
+        <div class="layui-input-block">
+            <select class="sel" id="dataIdentification" name="DataIdentification" lay-filter=""
+                    lay-verify="required|select">
+                <option value="-1">请选择数据标识</option>
+                <option value="1">基础能力</option>
+                <option value="2">学科能力</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item" lay-filter="classes-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">等级分类</label>
+            <div class="layui-input-block ">
+                <script type="text/html" template>
+                    <input type="text" id="abilityClassification" name="AbilityClassification" value="{{ d.params.abilityClassification || '' }}" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                    <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">等级名称</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="abilityName" name="AbilityName" value="{{ d.params.abilityName || '' }}" lay-verify="required|specialCharacters" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">最小分值</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" placeholder="" id="minScore" name="MinScore" value="{{ d.params.minScore || '' }}" maxlength="10" lay-verify="required|score|decimalplaces" maxlength="20" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">最大分值</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" placeholder="" id="maxScore" name="MaxScore" value="{{ d.params.maxScore || '' }}" maxlength="10" lay-verify="required|score|decimalplaces" maxlength="20" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">数据版本</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="dataVersion" name="DataVersion" value="{{ d.params.dataVersion || '' }}" lay-verify="required" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label ">显示顺序</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="displayOrder" name="DisplayOrder" value="{{ d.params.displayOrder || '' }}" lay-verify="required|mainnumber" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注信息</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <textarea placeholder="" id="remark" name="Remark" lay-verify="" class="layui-textarea">{{ d.params.remark || '' }}</textarea>
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="abilityclass-edit-form-submit">保存</button>
+        </div>
+    </div>
+</form>

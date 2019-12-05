@@ -1,0 +1,126 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="apiresource-configure-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">密码Secrets</li>
+        <li>声明信息Claims</li>
+        <li>作用域Scopes</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <!--Secrets-->
+        <div class="layui-tab-item layui-show">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加密码</legend>
+            </fieldset>
+            <form class="layui-form" id="apiresourcesecret-form" lay-filter="apiresourcesecret-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">密码</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="apiResourceId" name="apiResourceId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="Value" name="Value" lay-verify="required|password" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">描述</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="Description" name="Description" lay-verify="required|describelength" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="apiresourcesecret-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>密码列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="apiresourcesecret-table" lay-filter="apiresourcesecret-table"></table>
+                <script type="text/html" id="table-apiresourcesecret-btn" lay-filter="table-apiresourcesecret-btn">
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--Secrets-->
+        <!--Claims-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加声明</legend>
+            </fieldset>
+            <form class="layui-form" id="apiresourceclaims-form" lay-filter="apiresourceclaims-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">声明</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="apiResourceId" name="apiResourceId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="Type" name="Type" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="apiresourceclaims-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>声明列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="apiresourceclaims-table" lay-filter="apiresourceclaims-table"></table>
+                <script type="text/html" id="table-apiresourceclaims-btn" lay-filter="table-apiresourceclaims-btn">
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--Claims-->
+        <!--Scopes-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加作用域</legend>
+            </fieldset>
+            <form class="layui-form" id="apiresourcescope-form" lay-filter="apiresourcescope-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">名称</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="apiResourceId" name="apiResourceId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="name" name="name" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">显示名称</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="displayName" name="displayName" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">描述</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="description" name="description" lay-verify="required|describelength" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="apiresourcescope-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>作用域列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="apiresourcescope-table" lay-filter="apiresourcescope-table"></table>
+                <script type="text/html" id="table-apiresourcescope-btn" lay-filter="table-apiresourcescope-btn">
+                    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--Scopes-->
+    </div>
+</div>

@@ -1,0 +1,113 @@
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="ability-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="0">一般能力</li>
+        <li lay-id="1">综合能力</li>
+    </ul>
+    <div class="layui-tab-content">
+        <!--一般能力-->
+        <div class="layui-tab-item layui-show">
+            <form class="layui-form" id="abilityreference-add-form" lay-filter="abilityreference-add-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">能力维度</label>
+                    <div class="layui-input-block">
+                        <input type="hidden" id="abilityReferenceType" name="AbilityReferenceType" lay-verify="required" value="1"
+                            class="layui-input" />
+                        <input type="hidden" id="abilityId" name="AbilityId"
+                            class="layui-input" />
+                        <input type="text" id="abilityreference-tree" name="AbilityName"
+                            lay-filter="abilityreference-tree" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">能力分级</label>
+                    <div class="layui-input-block">
+                        <select id="ordinaryAbilityId" name="OrdinaryAbilityId" lay-verify="required|select"
+                            lay-filter="abilityNamefilter"></select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述类型</label>
+                    <div class="layui-input-block">
+                        <select id="descriptionType" name="DescriptionType" class="sel" lay-verify="required|select" lay-filter="">
+                            <option value="">请选择</option>
+                            <option value="1">能力概况</option>
+                            <option value="2">发展建议</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">编码</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="abilityCode-tree" name="AbilityCode" lay-filter="" lay-verify="required"
+                            class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-block ">
+                        <textarea id="description" name="Description" required lay-verify="required" placeholder=""
+                            class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item content-center">
+                    <button type="button" class="layui-btn" lay-filter="abilityreference-add-form-submit"
+                        lay-submit="abilityreference-add-form-submit">保存</button>
+                </div>
+            </form>
+        </div>
+        <!--综合能力-->
+        <div class="layui-tab-item">
+            <form class="layui-form" id="abilityreference-add" lay-filter="abilityreference-add">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">能力维度</label>
+                    <div class="layui-input-block">
+                        <input type="hidden" id="abilityReferenceType" name="AbilityReferenceType" lay-verify="required" value="2"
+                            class="layui-input" />
+                        <input type="hidden" id="abilityId" name="AbilityId"
+                            class="layui-input" />
+                        <input type="text" id="abilityName" name="AbilityName" value="综合能力" readonly
+                            lay-filter="" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">能力分级</label>
+                    <div class="layui-input-block">
+                        <select id="comprehensiveAbilityId" name="ComprehensiveAbilityId" lay-verify="required|select"
+                            lay-filter="abilityNamefilter"></select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述类型</label>
+                    <div class="layui-input-block">
+                        <select id="descriptionType" name="DescriptionType" class="sel" lay-verify="required|select" lay-filter="">
+                            <option value="">请选择</option>
+                            <option value="1">能力概况</option>
+                            <option value="2">发展建议</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">编码</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="abilityCode-tree" name="AbilityCode" lay-filter="" lay-verify="required"
+                            class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">描述</label>
+                    <div class="layui-input-block ">
+                        <textarea id="description" name="Description" required lay-verify="required" placeholder=""
+                            class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item content-center">
+                    <button type="button" class="layui-btn" lay-filter="abilityreference-add-form"
+                        lay-submit="abilityreference-add-form">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

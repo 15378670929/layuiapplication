@@ -1,0 +1,120 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="formData" lay-filter="formData">
+    <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+        <div class="layui-form-item">
+            <label class="layui-form-label">游戏名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="name" name="Name" lay-verify="required|normallength" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">能力类型</label>
+            <div class="layui-input-block">
+                <select id="abilityTypeId" name="AbilityTypeId" lay-verify="required|select" lay-filter="typefilter"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">一级能力</label>
+            <div class="layui-input-block">
+                <select id="firstAbilityId" name="FirstAbilityId" lay-verify="required|select" lay-filter="abilityfilter"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">二级能力</label>
+            <div class="layui-input-block">
+                <select id="secondAbilityId" name="SecondAbilityId" lay-verify="required|select" lay-filter="secondabilityfilter"></select>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+        <div class="layui-form-item">
+            <label class="layui-form-label">算分码</label>
+            <div class="layui-input-block ">
+                <select id="code" name="" lay-verify="required|select" lay-filter="codefilter">
+                    <option value="">请选择</option>
+                </select>
+                <input type="hidden" id="calculateCode" name="ExerciseCalculateCode" lay-verify="required" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">版本号</label>
+            <div class="layui-input-block">
+                <input type="text" id="version" name="Version" lay-verify="required|versions" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">最小年龄</label>
+            <div class="layui-input-block ">
+                <input type="text" id="minAge" name="MinAge" maxlength="2" lay-verify="required|number|age|positive" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">最大年龄</label>
+            <div class="layui-input-block ">
+                <input type="text" id="maxAge" name="MaxAge" maxlength="2" lay-verify="required|number|positive" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">科学名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="scientificName" name="ScientificName" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div class="layui-form-item">
+            <label class="layui-form-label">URL</label>
+            <div class="layui-input-block">
+                <input type="text" id="" name="Uri" lay-verify="required|url" autocomplete="off" placeholder="" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div class="layui-form-item">
+            <label class="layui-form-label">Icon</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal" id="uploadicon"><i class="layui-icon"></i>上传图片</button>
+                <div class="layui-inline layui-word-aux">
+                    上传图片大小为2M以内，格式为jpg、png
+                    <img class="layui-upload-img" id="showicon">
+                </div>
+                <input type="hidden" id="icon" name="Icon" lay-verify="" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div class="layui-form-item">
+            <label class="layui-form-label">Banner</label>
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn layui-btn-normal" id="uploadcoverPlanUri"><i class="layui-icon"></i>上传图片</button>
+                <div class="layui-inline layui-word-aux">
+                    上传图片大小为2M以内，格式为jpg、png
+                    <img class="layui-upload-img" id="showcoverPlanUri">
+                </div>
+                <input type="hidden" id="coverPlanUri" name="CoverPlanUri" lay-verify="" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">粗分说明</label>
+        <div class="layui-input-block ">
+            <textarea placeholder="" maxlength="100" lay-verify="required|normallengthT" minlength="2" class="layui-textarea" id="roughDescription" name="RoughDescription"></textarea>
+        </div>
+    </div>
+    <div class="layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <div class="layui-form-item">
+            <label class="layui-form-label">描述</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" maxlength="150" class="layui-textarea" id="description" name="Description"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item content-center layui-col-xs12 layui-col-sm12 layui-col-md12">
+        <button class="layui-btn" type="button" lay-submit lay-filter="evaluationgame-form-submit">保存</button>
+    </div>
+</form>
+<script>
+    layui.use(['evaluationgame'], function () { });
+</script>

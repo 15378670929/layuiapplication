@@ -1,0 +1,93 @@
+﻿<title>用户管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>项目中心</cite></a>
+        <a><cite>用户管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="usercourse-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="organization" name="organization" lay-filter="organizationfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="classes" name="classes" lay-filter=""></select>
+                </div>
+                <div class="layui-inline">
+                    <input type="text" name="name" onKeypress="javascript:if(event.keyCode == 32)event.returnValue = false;" id="name" placeholder="请输入姓名" autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-user" lay-submit lay-filter="user-search">搜索</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="users-table" lay-filter="users-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('projectimplementuser', layui.factory('projectimplementuser')).use(['admin', 'projectimplementuser', 'table', 'common', 'setter', 'layer', 'form'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , layer = layui.layer
+            , setter = layui.setter
+            , table = layui.table
+            , element = layui.element
+            , form = layui.form
+            , common = layui.common;
+
+        form.render();
+
+        //搜索
+        form.on('submit(user-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('users-table', {
+                where: {
+                    name: $("#name").val(),
+                    organizationId: $("#organization").val(),
+                    classId: $("#classes").val()
+                },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+
+        $("#classes").append("<option value=\"\">请选择班级</option>");
+
+        //获取机构
+        common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+            $("#organization").append("<option value=''>请选择机构</option>");
+            $.each(res.data, function (index, item) {
+                $("#organization").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+            });
+            form.render("select");
+        });
+
+        //获取班级
+        form.on('select(organizationfilter)', function (data) {
+            $("#classes").empty();
+            if (data.value != "") {
+                common.ajax(setter.apiAddress.classes.list, "GET", "", { organizationId: data.value }, function (res) {
+                    $("#classes").append("<option value=''>请选择班级</option>");
+                    $.each(res.data, function (index, item) {
+                        $("#classes").append("<option value=\"" + item.id + "\">" + item.gradeName + item.className + "</option>");
+                    });
+                    form.render("select");
+                });
+            } else {
+                $("#classes").empty();
+                form.render("select");
+            }
+        });
+    });
+</script>

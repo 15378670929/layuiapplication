@@ -1,0 +1,48 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item" lay-filter="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <input type="text" id="name" name="Name" lay-verify="required" value="{{ d.params.name || '' }}" maxlength="50" autocomplete="off" placeholder="" class="layui-input">
+                    <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <select class="sel" id="typeId" name="TypeId" lay-filter="typename" lay-verify="required|select"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">状态</label>
+            <div class="layui-input-block">
+                <select class="sel" id="status" name="Status" lay-filter="" lay-verify="required|select">
+                    <option value="0">删除</option>
+                    <option value="1">新建</option>
+                    <option value="2">测试中</option>
+                    <option value="3">已发布</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">内容</label>
+            <div class="layui-input-block">
+                <script type="text/html" template>
+                    <textarea id="context" name="Context" lay-verify="required" autocomplete="off" placeholder="" class="layui-textarea templatetype-textarea">{{ d.params.context || '' }}</textarea>
+                </script>
+            </div>
+        </div>
+        <div class="layui-form-item content-center">
+            <button class="layui-btn" type="button" lay-submit lay-filter="reporttemplate-form-submit">保存</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use('reporttemplate');
+</script>

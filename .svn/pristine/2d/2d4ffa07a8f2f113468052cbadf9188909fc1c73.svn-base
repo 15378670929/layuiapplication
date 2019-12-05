@@ -1,0 +1,632 @@
+<title>常模管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a lay-href="/content/evaluationgame/index"><cite>测评游戏</cite></a>
+        <a><cite>常模配置</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="normal-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="equipmentabtype-search-sel">
+                        <option value="">请选择设备</option>
+                        <option value="1">键盘</option>
+                        <option value="2">鼠标</option>
+                        <option value="3">混合</option>
+                        <option value="4">触摸屏</option>
+                    </select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="countryId" lay-filter="countryfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="provinceId" lay-filter="provincefilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="cityId" lay-filter="cityfilter"></select>
+                </div>
+                <div class="layui-input-inline">
+                    <select class="sel" id="districtId" lay-filter="districtfilter"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-normal-search" lay-submit lay-filter="normal-search">搜索</button>
+                    <button class="layui-btn btn-normal-add" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="normal-table" lay-filter="normal-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('evaluationgame', layui.factory('evaluationgame')).use(['evaluationgame', 'table', 'form', 'common', 'setter', 'verification', 'upload'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , common = layui.common
+            , upload = layui.upload
+            , form = layui.form;
+
+        //常模列表
+        table.render({
+            elem: '#normal-table'
+            , url: setter.apiAddress.normconfig.list
+            , cols: [[
+                {
+                    field: 'name', title: '测评游戏名称', align: 'center', templet: function (d) {
+                        if (d.evaluationGamesDto != null) {
+                            return d.evaluationGamesDto.name
+                        } return ''
+                    }
+                },
+                {
+                    field: 'country', title: '地区信息', align: 'center', templet: function (d) {
+                        if (d.province != null && d.city != null && d.district != null) {
+                            return d.country + d.province + d.city + d.district
+                        } else if (d.province != null && d.city != null && d.district == null) {
+                            return d.country + d.province + d.city
+                        } else if (d.province != null && d.city == null && d.district == null) {
+                            return d.country + d.province
+                        } else {
+                            return d.country
+                        }
+                    }
+                },
+                {
+                    field: 'deviceType', title: '设备信息', align: 'center', templet: function (d) {
+                        if (d.deviceType == "1") { return "键盘"; }
+                        else if (d.deviceType == "2") { return "鼠标"; }
+                        else if (d.deviceType == "3") { return "混合" }
+                        else { return "触屏"; }
+                    }
+                },
+                {
+                    field: 'defaultnorm', title: '是否默认', align: 'center', templet: function (d) { return d.defaultNorm == false ? "否" : "是"; }
+                },
+                {
+                    width: 320, title: '操作', align: 'center'
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        if (d.defaultNorm == true) {
+                            htmlButton.push('<a class="layui-btn layui-btn-disabled layui-btn-xs" lay-event="updatestaue"><i class="layui-icon layui-icon-edit"></i>设置默认</a>');
+                        } else {
+                            htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="updatestaue"><i class="layui-icon layui-icon-edit"></i>设置默认</a>');
+                        }
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="import"><i class="layui-icon layui-icon-upload"></i>导入</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" id="exportnorm" lay-event="export"><i class="layui-icon layui-icon-set"></i>导出</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="detail"><i class="layui-icon layui-icon-edit"></i>查看</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="normdel"><i class="layui-icon layui-icon-edit"></i>删除</a>');
+                        htmlButton.push('</div>');
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: true
+            , height: 'full-320'
+            , cellMinWidth: 80
+            , where: {
+                exerciseId: layui.router().search.exerciseId
+            }
+            , text: {
+                none: '暂无相关数据'
+            }
+            , response: {
+                statusCode: 200
+            }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.result.totalCount,
+                    "data": res.result.items
+                };
+            }
+        })
+        // 搜索
+        form.on('submit(normal-search)', function (data) {
+            console.log($('#equipmentabtype-search-sel').val());
+            table.reload('normal-table', {
+                where: {
+                    exerciseId: layui.router().search.exerciseId,
+                    countryId: $('#countryId').val(),
+                    provinceId: $('#provinceId').val(),
+                    cityId: $('#cityId').val(),
+                    districtId: $('#districtId').val(),
+                    deviceType: $('#equipmentabtype-search-sel').val(),
+                },
+                page: {
+                    curr: 1
+                }
+            });
+        });
+
+        // 获取国家信息
+        common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: 0 }, function (res) {
+            common.select("countryId", res.result, "", 1);
+            form.render("select");
+        });
+
+        //省
+        form.on('select(countryfilter)', function (data) {
+            $("#country").val($("#countryId").find("option:selected").text());
+            $("#provinceId").empty();
+            $("#cityId").empty();
+            $("#districtId").empty();
+            $("#provinceId").val("");
+            $("#pname").val("");
+            $("#cityId").val("");
+            $("#city").val("");
+            $("#districtId").val("");
+            $("#district").val("");
+            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                common.select("provinceId", res.result, "", 1);
+                form.render("select");
+            })
+        });
+        //获取城市
+        form.on('select(provincefilter)', function (data) {
+            $("#pname").val($("#provinceId").find("option:selected").text());
+            $("#cityId").empty();
+            $("#districtId").empty();
+            $("#cityId").val("");
+            $("#city").val("");
+            $("#districtId").val("");
+            $("#district").val("");
+            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                common.select("cityId", res.result, "", 1);
+                form.render("select");
+            })
+        });
+        //获取地区
+        form.on('select(cityfilter)', function (data) {
+            $("#city").val($("#cityId").find("option:selected").text());
+            $("#districtId").empty();
+            $("#districtId").val("");
+            $("#district").val("");
+            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                common.select("districtId", res.result, "", 1);
+                form.render("select");
+            })
+        });
+        //获取地区文本
+        form.on('select(districtfilter)', function (data) {
+            $("#district").val($("#districtId").find("option:selected").text());
+        });
+
+        //常模列表操作
+        table.on('tool(normal-table)', function (obj) {
+            var rowdata = obj.data;
+            if (obj.event === 'updatestaue') {
+                if (!rowdata.defaultNorm) {
+                    layer.confirm('确定设为默认常模？', function (index) {
+                        common.ajax(setter.apiAddress.normconfig.updatedefaultnorm, "POST", "", { exerciseId: rowdata.exerciseId, deviceType: rowdata.deviceType }, function (res) {
+                            if (res.statusCode == 200) {
+                                layer.close(index);
+                                table.reload('normal-table');
+                            }
+                            layer.msg(res.message);
+                        });
+                    });
+                }
+            } else if (obj.event === 'import') {
+                admin.popup({
+                    title: '导入常模'
+                    , area: ['800px', '80%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('content/evaluationgame/addnorm', rowdata).done(function () {
+                            form.render();
+                            $("#btn-import").hide();
+                            //获取测评游戏信息
+                            common.ajax(setter.apiAddress.evaluationgame.detail, "GET", "", { id: layui.router().search.exerciseId }, function (res) {
+                                $("#exerciseId").val(res.result.id);
+                                $("#exercisename").val(res.result.name);
+                                console.log(res);
+                            });
+
+                            //获取国家信息
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: 0 }, function (res) {
+                                common.select("countryIdadd", res.result, rowdata.countryId, 1);
+                                form.render("select");
+                                $("#countryIdadd").attr("disabled", "disabled").css("background-color", "#EEEEEE");
+                                if (null != rowdata.provinceId) {
+                                    //省
+                                    common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: rowdata.countryId }, function (res) {
+                                        common.select("provinceIdadd", res.result, rowdata.provinceId, 1);
+                                        $("#provinceIdadd").attr("disabled", "disabled").css("background-color", "#EEEEEE");
+                                        form.render("select");
+                                        if (null != rowdata.cityId) {
+                                            //市
+                                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: rowdata.provinceId }, function (res) {
+                                                common.select("cityIdadd", res.result, rowdata.cityId, 1);
+                                                $("#cityIdadd").attr("disabled", "disabled").css("background-color", "#EEEEEE");
+                                                form.render("select");
+                                                //区
+                                                if (null != rowdata.districtId) {
+                                                    common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: rowdata.cityId }, function (res) {
+                                                        common.select("districtIdadd", res.result, rowdata.districtId, 1);
+                                                        $("#districtIdadd").attr("disabled", "disabled").css("background-color", "#EEEEEE");
+                                                        form.render("select");
+                                                    })
+                                                }
+                                            })
+                                        }
+                                    })
+                                }
+                            });
+                            //是否默认常模开关
+                            form.val('import-norm-form', {
+                                "open": rowdata.defaultNorm
+                            })
+                            //设备
+                            if (rowdata.deviceType == "1") {
+                                $('#deviceTypeadd').append("<option value='1' selected >键盘</option>");
+                            } else if (rowdata.deviceType == "2") {
+                                $('#deviceTypeadd').append("<option value='2' selected >鼠标</option>");
+                            } else if (rowdata.deviceType == "3") {
+                                $('#deviceTypeadd').append("<option value='3' selected >混合</option>");
+                            } else if (rowdata.deviceType == "4") {
+                                $('#deviceTypeadd').append("<option value='4' selected >触摸屏</option>");
+                            }
+                            $("#deviceTypeadd").attr("disabled", "disabled").css("background-color", "#EEEEEE");
+
+                            //下载模板
+                            $("#downloadtemplate").attr('href', setter.apiAddress.normconfig.getimporttemplate);
+                            $("#downloadtemplate").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //下载错误模板
+                            $("#downloadresult").attr('href', setter.apiAddress.normconfig.getimportresult);
+                            $("#downloadresult").hide();
+                            $("#downloadresult").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //提交导入
+                            form.on('submit(btn-import-save)', function (data) {
+                                if ($(".layui-upload-file").next().html() != "" && $(".layui-upload-file").next().html() != undefined) {
+                                    $("#btn-import").click();
+                                } else {
+                                    layer.msg("请选择文件");
+                                }
+                            });
+                            //上传文件
+                            upload.render({
+                                elem: '#import-norm-from-xls'
+                                , url: setter.apiAddress.normconfig.uploadfile+"?filePath=content/evaluationgame/addnormimport"
+                                , accept: 'file'
+                                , field: "excelfile"
+                                , auto: false
+                                , bindAction: '#btn-import'
+                                , acceptMime: 'file/xlsx'
+                                , exts: 'xlsx'
+                                , size: 50
+                                , headers: { Authorization: "Bearer " + sessionStorage.getItem("access_token") }
+                                , before: function (obj) {
+                                    this.data =
+                                        {
+                                            exercisename: $("#exercisename").val(),
+                                            exerciseId: $("#exerciseId").val(),
+                                            countryId: $("#countryIdadd").val(),
+                                            country: rowdata.country,
+                                            provinceId: rowdata.provinceId == null ? "" : rowdata.provinceId,
+                                            cityId: rowdata.cityId == null ? "" : rowdata.cityId,
+                                            districtId: rowdata.districtId == null ? "" : rowdata.districtId,
+                                            province: rowdata.province,
+                                            city: rowdata.city,
+                                            district: rowdata.district,
+                                            deviceType: rowdata.deviceType,
+                                            defultnorm: $("input:checkbox[name='open']:checked").val(),
+                                            normType: 1
+                                        };
+                                    $("#btn-import-save").attr("disabled", true);
+                                    $("#btn-import-save").addClass("layui-btn-disabled");
+                                    layer.load();
+                                }
+                                , done: function (res, indexs, upload) {
+                                    layer.closeAll('loading');
+                                    $("#btn-import-save").attr("disabled", false);
+                                    $("#btn-import-save").removeClass("layui-btn-disabled");
+                                    if (res.statusCode == 205) {
+                                        var resultHtml = new Array();
+                                        resultHtml.push('<p>');
+                                        resultHtml.push(res.message);
+                                        resultHtml.push('</p>');
+                                        $("#importresult").html("");
+                                        $("#importresult").html(resultHtml.join(''));
+                                        $("#downloadresult").show();
+                                        table.reload('normal-table');
+                                    } else if (res.statusCode == 202) {
+                                        layer.msg(res.message);
+                                    } else {
+                                        table.reload('normal-table');
+                                        layer.msg(res.message);
+                                        layer.close(index);
+                                    }
+                                }
+                                , error: function (index, upload) {
+                                    layer.closeAll('loading');
+                                    layer.msg("导入数据失败!");
+                                }
+                            });
+                        });
+                    }
+                });
+            } else if (obj.event === 'export') {
+                if (rowdata.province != null && rowdata.city != null && rowdata.district != null) {
+                    $("#exportnorm").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&provinceId=" + rowdata.provinceId + "&cityId=" + rowdata.cityId + "&districtId=" + rowdata.districtId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                } else if (rowdata.province != null && rowdata.city != null && rowdata.district == null) {
+                    $("#exportnorm").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&provinceId=" + rowdata.provinceId + "&cityId=" + rowdata.cityId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                } else if (rowdata.province != null && rowdata.city == null && rowdata.district == null) {
+                    $("#exportnorm").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&provinceId=" + rowdata.provinceId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                } else {
+                    $("#exportnorm").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                }
+            } else if (obj.event === 'detail') {
+                admin.popup({
+                    title: '查看常模'
+                    , area: ['800px', '80%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('content/evaluationgame/normlist', rowdata).done(function () {
+                            form.render();
+                            if (rowdata.province != null && rowdata.city != null && rowdata.district != null) {
+                                $("#region").html("地区" + rowdata.country + rowdata.province + rowdata.city + rowdata.district)
+                            } else if (rowdata.province != null && rowdata.city != null && rowdata.district == null) {
+                                $("#region").html("地区" + rowdata.country + rowdata.province + rowdata.city)
+                            } else if (rowdata.province != null && rowdata.city == null && rowdata.district == null) {
+                                $("#region").html("地区" + rowdata.country + rowdata.province)
+                            } else {
+                                $("#region").html("地区" + rowdata.country)
+                            }
+
+                            if (rowdata.deviceType == "1") {
+                                $("#equipment").html("设备 键盘");
+                            } else if (rowdata.deviceType == "2") {
+                                $("#equipment").html("设备 鼠标");
+                            } else if (rowdata.deviceType == "3") {
+                                $("#equipment").html("设备 混合");
+                            } else if (rowdata.deviceType == "4") {
+                                $("#equipment").html("设备 触摸屏");
+                            }
+                            //常模列表详情
+                            table.render({
+                                elem: '#norm-list-table'
+                                , url: setter.apiAddress.normconfig.list
+                                , cols: [[
+                                    {
+                                        field: 'name', title: 'game_name', templet: function (d) {
+                                            if (d.evaluationGamesDto != null) { return d.evaluationGamesDto.name } return ""
+                                        }
+                                    },
+                                    { field: 'age', title: 'age' },
+                                    { field: 'gender', title: 'gender' },
+                                    { field: 'average', title: 'AVG' },
+                                    { field: 'standardDeviation', title: 'SD' }
+                                ]]
+                                , where: {
+                                    exerciseId: rowdata.exerciseId,
+                                    countryId: rowdata.countryId,
+                                    provinceId: rowdata.provinceId,
+                                    cityId: rowdata.cityId,
+                                    districtId: rowdata.districtId,
+                                    deviceType: rowdata.deviceType,
+                                    normType: 1
+                                }
+                                , page: true
+                                , text: {
+                                    none: '暂无相关数据'
+                                }
+                                , response: {
+                                    statusCode: 200
+                                }
+                                , parseData: function (res) {
+                                    return {
+                                        "code": res.statusCode,
+                                        "msg": res.message,
+                                        "count": res.result.totalCount,
+                                        "data": res.result.items
+                                    };
+                                }
+                            });
+
+                            //导出
+                            if (rowdata.province != null && rowdata.city != null && rowdata.district != null) {
+                                $("#exportnorma").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&provinceId=" + rowdata.provinceId + "&cityId=" + rowdata.cityId + "&districtId=" + rowdata.districtId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                            } else if (rowdata.province != null && rowdata.city != null && rowdata.district == null) {
+                                $("#exportnorma").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&provinceId=" + rowdata.provinceId + "&cityId=" + rowdata.cityId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                            } else if (rowdata.province != null && rowdata.city == null && rowdata.district == null) {
+                                $("#exportnorma").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&provinceId=" + rowdata.provinceId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                            } else {
+                                $("#exportnorma").attr('href', setter.apiAddress.normconfig.getexporttemplate + "?exerciseId=" + rowdata.exerciseId + "&countryId=" + rowdata.countryId + "&deviceType=" + rowdata.deviceType + "&normType=1");
+                            }
+
+                        });
+                    }
+                });
+
+            } else if (obj.event === 'normdel') {
+                layer.confirm('确定删除？', function (index) {
+                    common.ajax(setter.apiAddress.normconfig.delete, "POST", "", rowdata, function (res) {
+                        if (res.statusCode == 200) {
+                            layer.close(index);
+                            table.reload('normal-table');
+                        }
+                        layer.msg(res.message);
+                    });
+                });
+            }
+        });
+
+        //添加常模事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '新增常模'
+                    , area: ['800px', '80%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('content/evaluationgame/addnorm').done(function () {
+                            console.log("index++", index);
+                            form.render();
+                            $("#btn-import").hide();
+                            //获取题目壳信息
+                            common.ajax(setter.apiAddress.evaluationgame.detail, "GET", "", { id: layui.router().search.exerciseId }, function (res) {
+                                $("#exerciseId").val(res.result.id);
+                                $("#exercisename").val(res.result.name);
+                            });
+                            //获取国家信息
+                            common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: 0 }, function (res) {
+                                common.select("countryIdadd", res.result, "", 1);
+                                form.render("select");
+                            });
+                            // 选择国家
+                            form.on('select(countryfilteradd)', function (data) {
+                                $("#countryadd").val($("#countryIdadd").find("option:selected").text());
+                                $("#provinceIdadd").empty();
+                                $("#cityIdadd").empty();
+                                $("#districtIdadd").empty();
+                                $("#provinceIdadd").val("");
+                                $("#pnameadd").val("");
+                                $("#cityIdadd").val("");
+                                $("#cityadd").val("");
+                                $("#districtIdadd").val("");
+                                $("#districtadd").val("");
+                                common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                    common.select("provinceIdadd", res.result, "", 1);
+                                    form.render("select");
+                                })
+                            });
+
+                            //获取城市
+                            form.on('select(provincefilteradd)', function (data) {
+                                $("#pnameadd").val($("#provinceIdadd").find("option:selected").text());
+                                $("#cityIdadd").empty();
+                                $("#districtIdadd").empty();
+                                $("#cityIdadd").val("");
+                                $("#cityadd").val("");
+                                $("#districtIdadd").val("");
+                                $("#districtadd").val("");
+                                common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                    common.select("cityIdadd", res.result, "", 1);
+                                    form.render("select");
+                                })
+                            });
+                            //获取地区
+                            form.on('select(cityfilteradd)', function (data) {
+                                $("#cityadd").val($("#cityIdadd").find("option:selected").text());
+                                $("#districtIdadd").empty();
+                                $("#districtIdadd").val("");
+                                $("#districtadd").val("");
+                                common.ajax(setter.apiAddress.region.loadchilds, "GET", "", { parentId: data.value }, function (res) {
+                                    common.select("districtIdadd", res.result, "", 1);
+                                    form.render("select");
+                                })
+                            });
+                            //获取地区文本
+                            form.on('select(districtfilteradd)', function (data) {
+                                $("#districtadd").val($("#districtIdadd").find("option:selected").text());
+                            });
+
+                            //下载模板
+                            $("#downloadtemplate").attr('href', setter.apiAddress.normconfig.getimporttemplate);
+                            $("#downloadtemplate").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //下载错误模板
+                            $("#downloadresult").attr('href', setter.apiAddress.normconfig.getimportresult);
+                            $("#downloadresult").hide();
+                            $("#downloadresult").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //提交导入
+                            form.on('submit(btn-import-save)', function (data) {
+                                if ($(".layui-upload-file").next().html() != "" && $(".layui-upload-file").next().html() != undefined) {
+                                    $("#btn-import").click();
+                                } else {
+                                    layer.msg("请选择文件");
+                                }
+                            });
+                            //上传文件
+                            upload.render({
+                                elem: '#import-norm-from-xls'
+                                , url: setter.apiAddress.normconfig.uploadfile+"?filePath=content/evaluationgame/addnorm"
+                                , accept: 'file'
+                                , field: "excelfile"
+                                , auto: false
+                                , bindAction: '#btn-import'
+                                , acceptMime: 'file/xlsx'
+                                , exts: 'xlsx'
+                                , size: 50
+                                , headers: { Authorization: "Bearer " + sessionStorage.getItem("access_token") }
+                                , before: function (obj) {
+                                    this.data =
+                                        {
+                                            exercisename: $("#exercisename").val(),
+                                            exerciseId: $("#exerciseId").val(),
+                                            countryId: $("#countryIdadd").val(),
+                                            country: $("#countryadd").val(),
+                                            provinceId: $("#provinceIdadd").val() == null ? "" : $("#provinceIdadd").val(),
+                                            cityId: $("#cityIdadd").val() == null ? "" : $("#cityIdadd").val(),
+                                            districtId: $("#districtIdadd").val() == null ? "" : $("#districtIdadd").val(),
+                                            province: $("#pnameadd").val(),
+                                            city: $("#cityadd").val(),
+                                            district: $("#districtadd").val(),
+                                            deviceType: $("#deviceTypeadd").val(),
+                                            defultnorm: $("input:checkbox[name='open']:checked").val(),
+                                            normType: 1
+                                        };
+                                    $("#btn-import-save").attr("disabled", true);
+                                    $("#btn-import-save").addClass("layui-btn-disabled");
+                                    layer.load();
+                                }
+                                , done: function (res, indexs, upload) {
+                                    console.log(res);
+                                    layer.closeAll('loading');
+                                    $("#btn-import-save").attr("disabled", false);
+                                    $("#btn-import-save").removeClass("layui-btn-disabled");
+                                    if (res.statusCode == 205) {
+                                        var resultHtml = new Array();
+                                        resultHtml.push('<p>');
+                                        resultHtml.push(res.message);
+                                        resultHtml.push('</p>');
+                                        $("#importresult").html("");
+                                        $("#importresult").html(resultHtml.join(''));
+                                        $("#downloadresult").show();
+                                        table.reload('normal-table');
+                                    } else if (res.statusCode == 202) {
+                                        layer.msg(res.message);
+                                    } else {
+                                        table.reload('normal-table');
+                                        layer.msg(res.message);
+                                        layer.close(index);
+                                    }
+                                }
+                                , error: function (index, upload) {
+                                    layer.closeAll('loading');
+                                    layer.msg("导入数据失败!");
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        }
+        $('.layui-btn.btn-normal-add').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    })
+</script>

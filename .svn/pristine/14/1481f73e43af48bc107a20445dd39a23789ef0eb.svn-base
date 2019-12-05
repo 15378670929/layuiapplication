@@ -1,0 +1,86 @@
+﻿<title>能力分级</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a><cite>综合能力类型</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="comprehensiveabilityclass-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <button class="layui-btn btn-comprehensiveabilityclass" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="comprehensiveabilityclass-table" lay-filter="comprehensiveabilityclass-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('comprehensiveabilityclass', layui.factory('comprehensiveabilityclass')).use(['admin', 'comprehensiveabilityclass', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render(null, 'comprehensiveabilityclass-search');
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['30%', '40%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('report/comprehensiveabilityclass/add').done(function () {
+                            form.render(null, 'comprehensiveabilityclass-form');
+                            form.render('radio');
+                            // 初始化综合能力类型下拉框
+                            common.ajax(setter.apiAddress.comprehensiveability.loadall, "GET", "", {}, function (res) {
+                                $("#comprehensiveAbilityId").empty();
+                                $("#comprehensiveAbilityId").append("<option value=\"\">请选择综合能力类型</option>");
+                                $.each(res.result, function (index, item) {
+                                    $("#comprehensiveAbilityId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                });
+                                form.render("select");
+                            });
+                            form.on('submit(comprehensiveabilityclass-add-form-submit)', function (data) {
+                                data.field.DisplayOrder = parseInt(data.field.DisplayOrder)
+                                common.ajax(setter.apiAddress.comprehensiveabilityclass.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layui.table.reload('comprehensiveabilityclass-table');
+                                        layer.close(index);
+                                    }
+                                    layer.msg(res.message);
+                                }, function (error) {
+                                    layer.msg(error.msg);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.btn-comprehensiveabilityclass').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>

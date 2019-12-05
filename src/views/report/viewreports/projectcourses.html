@@ -1,0 +1,35 @@
+﻿<title>项目课程信息</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a href="#/report/viewreports/index"><cite>测评报告管理</cite></a>
+        <a><cite>项目课程</cite></a>
+    </div>
+</div>
+<div class="layui-fluid layui-col-space15">
+    <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+        <div class="layui-card">
+            <div class="layui-card-header">课程信息</div>
+            <div class="layui-card-body" id="course-div">
+                <table class="layui-table" id="course-table" lay-filter="course-table"></table>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+        <div class="layui-card">
+            <div class="layui-card-header">课时信息</div>
+            <div class="layui-card-body">
+                <table class="layui-table" id="subcourse-table" lay-filter="subcourse-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use('viewreportscourses', layui.factory('viewreportscourses')).use(['admin', 'table', 'element', 'viewreportscourses', 'laydate', 'common', 'setter', 'layer', 'form'], function () {
+
+    });
+</script>

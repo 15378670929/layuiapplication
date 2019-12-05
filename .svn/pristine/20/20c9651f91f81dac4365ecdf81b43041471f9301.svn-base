@@ -1,0 +1,62 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="" lay-filter="example">
+    <div class="layui-form-item">
+        <label class="layui-form-label">能力名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="name" name="Name" maxlength="20" lay-verify="required|normallength" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">父能力</label>
+        <div class="layui-input-block">
+            <input type="hidden" id="parentId" name="ParentId" />
+            <input type="text" id="dicabilitytype-tree" lay-filter="dicabilitytype-tree" readonly="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">能力等级</label>
+        <div class="layui-input-block">
+            <input type="text" id="level" name="LevelNumber" readonly="readonly" lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">能力颜色</label>
+        <div class="layui-input-block" style="display:flex">
+            <input type="text" id="color" name="Color" readonly="readonly" placeholder="请选择颜色" lay-verify="required" autocomplete="off" class="layui-input">
+            <span id="abilitycolor"></span>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">能力图标</label>
+        <div class="layui-input-block">
+            <button type="button" class="layui-btn layui-btn-normal" id="uploadicon"><i class="layui-icon"></i>上传图片</button>
+            <div class="layui-inline layui-word-aux">
+                上传图片大小为2M以内，格式为jpg、png
+                <img class="layui-upload-img" id="showicon">
+            </div>
+            <input type="hidden" id="icon" name="Icon" lay-verify="required" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">短描述</label>
+        <div class="layui-input-block">
+            <input type="text" id="shortDescription" maxlength="20" name="ShortDescription" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">长描述</label>
+        <div class="layui-input-block">
+            <textarea placeholder="" id="longDescription" maxlength="150" name="LongDescription" lay-verify="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="dicability-form-submit">保存</button>
+    </div>
+</form>
+<script>
+    layui.use(['dicability'], function () {
+    });
+</script>

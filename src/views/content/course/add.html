@@ -1,0 +1,44 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="course-add-form" lay-filter="course-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="Name" name="Name" lay-verify="required|normallength" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">版本</label>
+        <div class="layui-input-block ">
+            <input type="text" id="Version" name="Version" lay-verify="required|versions" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">图标</label>
+        <div class="layui-input-block ">
+            <button type="button" class="layui-btn layui-btn-normal" id="uploadicon"><i class="layui-icon"></i>上传图片</button>
+            <div class="layui-inline layui-word-aux">
+                图标大小为2M以内，格式为jpg | png。
+                <img class="layui-upload-img" id="showicon">
+            </div>
+            <input type="hidden" id="icon" name="Icon" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block ">
+            <input type="text" id="remark" name="Remark" lay-verify="" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Status" value="true" title="启用" checked>
+            <input type="radio" name="Status" value="false" title="禁用">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="course-add-form-submit" lay-submit="course-add-form-submit">保存</button>
+    </div>
+</form>

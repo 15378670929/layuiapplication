@@ -1,0 +1,53 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="adminuser-add-form" lay-filter="adminuser-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">机构</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="OrganizationId" name="OrganizationId" lay-verify="required|select" lay-filter="add-user-organization-filter"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="RoleId" name="RoleId" lay-verify="required|select" lay-filter=""></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block ">
+            <input type="text" id="UserName" name="UserName" lay-verify="required" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-block ">
+            <input type="text" id="UserAccount" name="UserAccount" lay-verify="required|username" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-block ">
+            <input type="text" id="PhoneNumber" name="PhoneNumber" lay-verify="required|isPhoneNumber" maxlength="11" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block ">
+            <input type="password" id="PasswordHash" name="PasswordHash" lay-verify="required|password" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">性别</label>
+        <div class="layui-input-block">
+            <select id="Gender" name="Gender" lay-verify="">
+                <option value="男">男</option>
+                <option value="女">女</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="adminuser-add-form-submit" lay-submit="adminuser-add-form-submit">保存</button>
+    </div>
+</form>

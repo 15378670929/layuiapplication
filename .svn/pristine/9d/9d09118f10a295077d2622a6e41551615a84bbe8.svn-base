@@ -1,0 +1,101 @@
+﻿/**
+ @Name：系统角色
+ */
+layui.define(['table', 'form', 'common', 'setter', 'laydate', 'verification'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , laydate = layui.laydate
+        , verification = layui.verification
+        , form = layui.form;
+
+    table.render({
+        elem: '#roles-table'
+        , url: setter.apiAddress.roles.pagelist
+        , cols: [[
+            { field: 'name', title: '角色' },
+            { field: 'organizationName', title: '机构' },
+            {
+                width: 200,
+                title: '操作',
+                align: 'center',
+                templet: function (d) {
+                    var reportUrl = d.reportUrl;
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="rightsettings"><i class="layui-icon layui-icon-set-fill"></i>权限设置</a>');
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: true
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.data.totalCount,
+                "data": res.data.items
+            };
+        }
+    });
+
+
+
+    //claims
+    table.on('tool(roles-table)', function (obj) {
+        var rowdata = obj.data;
+        if (obj.event === 'rightsettings') {
+            location.hash = '/settings/roles/permissionsettings/role=' + rowdata.id;
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑'
+                , area: ['500px', '30%']
+                , resize: true
+                , success: function (layero, index) {
+                    view(this.id).render('settings/roles/edit', rowdata).done(function () {
+                        //获取机构
+                        common.ajax(setter.apiAddress.organization.loadall, "GET", "", {}, function (res) {
+                            $("#organizationId").append("<option value=\"\">请选择机构</option>");
+                            $.each(res.data, function (index, item) {
+                                if (item.id == rowdata.organizationId) {
+                                    $("#organizationId").append("<option selected value=\"" + item.id + "\">" + item.name + "</option>");
+                                }
+                                else {
+                                    $("#organizationId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                }
+                            });
+                            form.render("select");
+                        });
+                        form.render();
+                        //监听提交
+                        form.on('submit(roles-edit-form-submit)', function (data) {
+                            data.field.OrganizationName = $('dl.layui-anim .layui-this').html()
+                            common.ajax(setter.apiAddress.roles.edit, "POST", "", data.field, function (res) {
+                                if (res.statusCode == 200) {
+                                    layer.close(index);
+                                    table.reload('roles-table');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    });
+
+    exports('roles', {})
+});

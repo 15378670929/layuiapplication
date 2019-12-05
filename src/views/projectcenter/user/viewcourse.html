@@ -1,0 +1,179 @@
+﻿<title>课程明细</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>项目中心</cite></a>
+        <a href="#/projectcenter/user/index"><cite>用户管理</cite></a>
+        <a><cite>课程明细</cite></a>
+    </div>
+</div>
+<div class="layui-fluid layui-col-space15">
+    <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+        <div class="layui-card">
+            <div class="layui-card-header"><p class="userinfo"></p></div>
+            <div class="layui-card-body" id="course-div">
+                <table class="layui-table" id="course-table" lay-filter="course-table"></table>
+                <script type="text/html" id="progressTpl">
+                    <div class="layui-progress layuiadmin-order-progress" lay-filter="progress-" + {{ d.courseId }} +"">
+                        <div class="layui-progress-bar layui-bg-blue" lay-percent={{ d.courseProgress }}></div>
+                    </div>
+                </script>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-xs6 layui-col-sm6 layui-col-md6">
+        <div class="layui-card">
+            <div class="layui-card-header"><p class="userinfochild"></p></div>
+            <div class="layui-card-body">
+                <table class="layui-table" id="subcourse-table" lay-filter="subcourse-table"></table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use('projectimplementuser', layui.factory('projectimplementuser')).use(['admin', 'table', 'element', 'projectimplementuser', 'laydate', 'common', 'setter', 'layer', 'form'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , layer = layui.layer
+            , setter = layui.setter
+            , table = layui.table
+            , form = layui.form
+            , element = layui.element
+            , common = layui.common;
+
+        //渲染用户姓名
+        common.ajax(setter.apiAddress.userprofile.detail, "GET", "", { id: layui.router().search.user }, function (res) {
+            if (res.statusCode == 200) {
+                $(".userinfo").html(res.data.realName + "的课程信息");
+                $(".userinfochild").html(res.data.realName + "的课时信息");
+            }
+        });
+
+        //课程信息
+        table.render({
+            elem: '#course-table'
+            , url: setter.apiAddress.projectcourseuser.usercourse
+            , cols: [[
+                { field: 'projectName', title: '项目名称' },
+                { field: 'name', title: '课程名称' },
+                { field: 'remark', title: '备注' },
+                {
+                    field: 'icon', title: 'Icon', templet: function (d) {
+                        if (d.icon != null && d.icon != "") {
+                            return '<img style="width:26px;display: inline-block;" class="layui-upload-img" src=' + d.icon + '>'
+                        } return ""
+                    }
+                },
+                { field: 'courseProgress', title: '进度', templet: '#progressTpl' },
+                {
+                    title: '操作', align: 'center', width: 200
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="viewsubcourse"><i class="layui-icon layui-icon-align-center"></i>课时</a>');
+                        htmlButton.push('</div>')
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: {
+                curr: 0
+            }
+            , where: {
+                userId: layui.router().search.user
+            }
+            , height: 'full-320'
+            , text: {
+                none: '暂无相关数据'
+            }
+            , response: {
+                statusCode: 200
+            }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.data.totalCount,
+                    "data": res.data.items
+                };
+            }
+            , done: function (res, curr, count) {
+                element.render('progress');
+                var courseId = 0;
+                var projectId = 0;
+                if (res.data.length > 0) {
+                    courseId = res.data[0].courseId;
+                    projectId = res.data[0].projectId;
+                }
+                initSubCourse(projectId, courseId)
+            }
+        });
+
+        //课程的课时列表
+        function initSubCourse(projectId, courseId) {
+            table.render({
+                elem: '#subcourse-table'
+                , url: setter.apiAddress.projectcourseuser.usercoursechild
+                , cols: [[
+                    { field: 'name', title: '课时名称' },
+                    { field: 'remark', title: '备注' },
+                    {
+                        field: 'isEnable', title: '启用', align: 'center', width: 80,
+                        templet: function (d) {
+                            return d.isEnable == 1 ? "<span style='color:#009688;'>启用</span>" : "<span style='color:#FF5722;'>禁用</span>";
+                        }
+                    },
+                    {
+                        field: 'isFinished', title: '完成', align: 'center', width: 80,
+                        templet: function (d) {
+                            return d.isFinished == 1 ? "<span style='color:#009688;'>完成</span>" : "<span style='color:#FF5722;'>未完成</span>";
+                        }
+                    },
+                    { field: 'displayOrder', title: '排序' },
+                ]]
+                , page: true
+                , height: 'full-320'
+                , where: {
+                    organizationId: layui.router().search.organization,
+                    projectId: projectId,
+                    courseId: courseId,
+                    userId: layui.router().search.user
+                }
+                , text: { none: '暂无相关数据' }
+                , response: { statusCode: 200 }
+                , parseData: function (res) {
+                    return {
+                        "code": res.statusCode,
+                        "msg": res.message,
+                        "count": res.data.totalCount,
+                        "data": res.data.items
+                    };
+                }
+            });
+        }
+
+        //课程事件
+        table.on('tool(course-table)', function (obj) {
+            var rowcouserdata = obj.data;
+            if (obj.event === 'viewsubcourse') {
+                initSubCourse(rowcouserdata.projectId, rowcouserdata.courseId);
+            }
+        });
+
+        //搜索
+        form.on('submit(usercourse-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('course-table', {
+                where: {
+                    projectId: $("#project").val(),
+                    organizationId: layui.router().search.organization
+                }
+            });
+        });
+    });
+</script>

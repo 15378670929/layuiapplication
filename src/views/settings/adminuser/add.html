@@ -1,0 +1,39 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="adminuser-add-form" lay-filter="adminuser-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">姓名</label>
+        <div class="layui-input-block ">
+            <input type="text" id="UserName" name="UserName" lay-verify="required" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Gender" value="false" title="男">
+            <input type="radio" name="Gender" value="true" title="女" checked>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">账号</label>
+        <div class="layui-input-block ">
+            <input type="text" id="UserAccount" name="UserAccount" lay-verify="required|username" minlength="6" maxlength="16" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block ">
+            <input type="password" id="UserPwd" name="UserPwd" lay-verify="required|password" minlength="6" maxlength="18" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机号</label>
+        <div class="layui-input-block ">
+            <input type="text" id="PhoneNumber" name="PhoneNumber" lay-verify="isPhoneNumber" maxlength="11" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="adminuser-add-form-submit" lay-submit="adminuser-add-form-submit">保存</button>
+    </div>
+</form>

@@ -1,0 +1,21 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="roles-add-form" lay-filter="roles-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色名称</label>
+        <div class="layui-input-block ">
+            <input type="text" id="roleName" name="RoleName" lay-verify="required" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">角色描述</label>
+        <div class="layui-input-block">
+            <textarea placeholder="" id="description" name="Description" lay-verify="" maxlength="40" class="layui-textarea roles-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="roles-add-form-submit">保存</button>
+    </div>
+</form>

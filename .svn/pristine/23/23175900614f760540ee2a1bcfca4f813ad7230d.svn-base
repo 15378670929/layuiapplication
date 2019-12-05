@@ -1,0 +1,755 @@
+﻿/**
+ @Name：项目实施-项目实施信息-课程信息
+ */
+layui.define(['admin', 'table', 'element', 'laydate', 'common', 'setter', 'layer', 'form'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , layer = layui.layer
+        , setter = layui.setter
+        , table = layui.table
+        , element = layui.element
+        , laydate = layui.laydate
+        , form = layui.form
+        , common = layui.common;
+
+    //课程信息列表
+    table.render({
+        elem: '#course-table'
+        , url: setter.apiAddress.projectcourseconfig.list
+        , cols: [[
+            {
+                field: 'name', title: '课程名称', templet: function (d) {
+                    if (d.courseDto != null) {
+                        return d.courseDto.name
+                    }
+                    return ""
+                }
+            },
+            {
+                field: 'version', title: '版本', width: 100, align: 'center', templet: function (d) {
+                    if (d.courseDto != null) {
+                        return d.courseDto.version
+                    }
+                    return ""
+                }
+            },
+            {
+                field: 'isEnable', title: '课程状态', align: 'center', width: 100,
+                templet: function (d) {
+                    return d.isEnable == 1 ? "<span style='color:#009688;'>启用</span>" : "<span style='color:#FF5722;'>禁用</span>";
+                }
+            },
+            {
+                field: 'isFinished', title: '完成状态', align: 'center', width: 100,
+                templet: function (d) {
+                    return d.isFinished == 1 ? "<span style='color:#009688;'>完成</span>" : "<span style='color:#FF5722;'>未完成</span>";
+                }
+            },
+            {
+                title: '操作', align: 'center', width: 135
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="viewsubcourse"><i class="layui-icon layui-icon-align-center"></i>课时</a>');
+                    if (d.isEnable) {
+                        htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="enable"><i class="layui-icon layui-icon-ok"></i>禁用</a>');
+                    } else {
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="enable"><i class="layui-icon layui-icon-close"></i>启用</a>');
+                    }
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: {
+            curr: 0
+        }
+        , where: {
+            projectId: layui.router().search.project,
+            organizationId: layui.router().search.organization
+        }
+        , height: 'full-320'
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.data.totalCount,
+                "data": res.data.items
+            };
+        }
+        , done: function (res, curr, count) {
+            var courseId = 0;
+            if (res.data.length > 0) {
+                courseId = res.data[0].courseId
+            }
+            initSubCourse(layui.router().search.project, courseId)
+        }
+    });
+
+    //课程的课时信息列表
+    function initSubCourse(projectId, courseId) {
+        table.render({
+            elem: '#subcourse-table'
+            , url: setter.apiAddress.projectcoursechild.list
+            , cols: [[
+                {
+                    field: 'name', title: '课时名称', templet: function (d) {
+                        if (d.courseChildDto != null) {
+                            return d.courseChildDto.name
+                        }
+                        return ""
+                    }
+                },
+                {
+                    field: 'version', title: '版本', width: 80, align: 'center', templet: function (d) {
+                        if (d.courseChildDto != null) {
+                            return d.courseChildDto.version
+                        }
+                        return ""
+                    }
+                },
+                {
+                    field: 'isEnable', title: '课时状态', align: 'center', width: 100,
+                    templet: function (d) {
+                        return d.isEnable == 1 ? "<span style='color:#009688;'>启用</span>" : "<span style='color:#FF5722;'>禁用</span>";
+                    }
+                },
+                {
+                    field: 'isFinished', title: '完成状态', align: 'center', width: 100,
+                    templet: function (d) {
+                        return d.isFinished == 1 ? "<span style='color:#009688;'>完成</span>" : "<span style='color:#FF5722;'>未完成</span>";
+                    }
+                },
+                {
+                    width: 220, title: '操作', align: 'center'
+                    , templet: function (d) {
+                        var htmlButton = new Array();
+                        htmlButton.push('<div class="layui-btn-group">')
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="createcoursecode"><i class="layui-icon layui-icon-edit"></i>课程码</a>');
+                        htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="setuser"><i class="layui-icon layui-icon-user"></i>用户管理</a>');
+                        if (d.isEnable) {
+                            htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="enable"><i class="layui-icon layui-icon-close"></i>禁用</a>');
+                        } else {
+                            htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="enable"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                        }
+                        htmlButton.push('</div>')
+                        return htmlButton.join('');
+                    }
+                }
+            ]]
+            , page: true
+            , height: 'full-320'
+            , where: { projectId: projectId, courseId: courseId }
+            , text: { none: '暂无相关数据' }
+            , response: { statusCode: 200 }
+            , parseData: function (res) {
+                return {
+                    "code": res.statusCode,
+                    "msg": res.message,
+                    "count": res.data.totalCount,
+                    "data": res.data.items
+                };
+            }
+        });
+    }
+
+    //课程事件
+    table.on('tool(course-table)', function (obj) {
+        var rowcouserdata = obj.data;
+        if (obj.event === 'viewsubcourse') {
+            initSubCourse(layui.router().search.project, rowcouserdata.courseId);
+        } else if (obj.event === 'enable') {
+            var titletext = "确认禁用？";
+            if (!rowcouserdata.isEnable) {
+                titletext = "确认启用？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.projectcourseconfig.updateisenable, "POST", "", { Id: rowcouserdata.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        table.reload('course-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        }
+    });
+
+    /**
+     * 
+     * 课程码相关
+     * 
+     * **/
+
+    //创建课程码
+    function CreateCourseCode() {
+        var str = '';
+        var i;
+        for (i = 0; i < 6; i++) {
+            var number = Math.floor(Math.random() * 10);
+            str += number;
+        }
+        return str;
+    }
+
+    //保存课程码
+    function SaveCode(id) {
+        var code = CreateCourseCode();
+        common.ajax(setter.apiAddress.projectcourseuser.checkcourescode, "GET", "", { userCoursCode: code }, function (res) {
+            if (res.statusCode == 200) {
+                $("#" + id + "").val("");
+                $("#" + id + "").val(code);
+            } else {
+                SaveCode();
+            }
+        });
+    }
+
+    //课时事件
+    table.on('tool(subcourse-table)', function (obj) {
+        var rowdata = obj.data;
+        if (obj.event === 'enable') {
+            var titletext = "确认禁用？";
+            if (!rowdata.isEnable) {
+                titletext = "确认启用？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.projectcoursechild.updateisenable, "POST", "", { id: rowdata.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        table.reload('subcourse-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'createcoursecode') {
+            admin.popup({
+                title: '生成课程码'
+                , area: ['600px', '35%']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('projectcenter/projectimplement/createcoursecode', rowdata).done(function () {
+                        //查询是否存在课程码
+                        common.ajax(setter.apiAddress.coursecode.checkmodel, "GET", "", {
+                            organizationId: rowdata.organizationId,
+                            projectId: rowdata.projectId,
+                            courseId: rowdata.courseId,
+                            courseChildId: rowdata.courseChildId
+                        }, function (res) {
+                            //存在课程码
+                            if (res.statusCode == 200) {
+                                var coursecode = res.data;
+                                $("#code").val(coursecode.code);
+                                $("#expirationDate").val(coursecode.expirationDate);
+                                $("#beforecode").val(coursecode.code);
+                                var now = common.nowdate();
+                                var date3 = new Date(coursecode.expirationDate).getTime() - new Date(now).getTime()//时间差的毫秒数                                
+                                var days = Math.floor(date3 / (24 * 3600 * 1000))
+                                var leave1 = date3 % (24 * 3600 * 1000)//计算天数后剩余的毫秒数
+                                var hours = Math.floor(leave1 / (3600 * 1000))
+                                var leave2 = leave1 % (3600 * 1000) //计算小时数后剩余的毫秒数
+                                var minutes = Math.floor(leave2 / (60 * 1000))
+                                var leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
+                                var seconds = Math.round(leave3 / 1000)
+                                if(coursecode.code == ''){
+                                    $("#effectiveDate").val("");
+                                    $("#expirationDate").val('');
+                                } else if (new Date(coursecode.expirationDate.replace("-", "/").replace("-", "/")) <= new Date(now.replace("-", "/").replace("-", "/"))) {
+                                    $("#effectiveDate").val("课程码已过期");
+                                } else {
+                                    $("#effectiveDate").val("课程码在" + days + "天 " + hours + "小时 " + minutes + " 分钟" + seconds + " 秒之后过期");
+                                }
+
+                                //生成课程码切换
+                                $("#coursecode").click(function () {
+                                    SaveCode("code");
+                                    if(coursecode.code == ''){
+                                        laydate.render({
+                                            elem: '#expirationDate'
+                                            , type: 'datetime'
+                                            , theme: 'grid'
+                                            , value: new Date(new Date().setMonth(new Date().getMonth() + 1))
+                                            , change: function (value, date) {
+                                                var now = common.nowdate();
+                                                var date3 = new Date(value).getTime() - new Date(now).getTime()//时间差的毫秒数
+                                                var days = Math.floor(date3 / (24 * 3600 * 1000))
+                                                var leave1 = date3 % (24 * 3600 * 1000)//计算天数后剩余的毫秒数
+                                                var hours = Math.floor(leave1 / (3600 * 1000))
+                                                var leave2 = leave1 % (3600 * 1000) //计算小时数后剩余的毫秒数
+                                                var minutes = Math.floor(leave2 / (60 * 1000))
+                                                var leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
+                                                var seconds = Math.round(leave3 / 1000)
+                                                if (new Date(value.replace("-", "/").replace("-", "/")) <= new Date(now.replace("-", "/").replace("-", "/"))) {
+                                                    layer.tips("所选时间不能小于等于当前时间", '#expirationDate');
+                                                    $("#effectiveDate").val("");
+                                                } else {
+                                                    $("#effectiveDate").val("课程码在" + days + "天 " + hours + "小时 " + minutes + " 分钟" + seconds + " 秒之后过期");
+                                                }
+                                            }
+                                        });
+                                    }
+                                    var date=new Date();
+                                    //将当前月份加1，下移到下一个月
+                                    date.setMonth(date.getMonth()+1);
+                                    //将当前的日期置为0，
+                                    date.setDate(0);
+                                    //再获取天数即取上个月的最后一天的天数
+                                    var dayss=date.getDate();
+                                    $("#effectiveDate").val("课程码在" + dayss + "天 0小时 0 分钟0 秒之后过期");
+                                });
+
+                                var time = true;
+                                laydate.render({
+                                    elem: '#expirationDate'
+                                    , type: 'datetime'
+                                    , theme: 'grid'
+                                    , change: function (value, date) {
+                                        var now = common.nowdate();
+                                        //计算相差秒数
+                                        var date3 = new Date(value).getTime() - new Date(now).getTime()//时间差的毫秒数
+                                        var days = Math.floor(date3 / (24 * 3600 * 1000))
+                                        var leave1 = date3 % (24 * 3600 * 1000)//计算天数后剩余的毫秒数
+                                        var hours = Math.floor(leave1 / (3600 * 1000))
+                                        var leave2 = leave1 % (3600 * 1000) //计算小时数后剩余的毫秒数
+                                        var minutes = Math.floor(leave2 / (60 * 1000))
+                                        var leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
+                                        var seconds = Math.round(leave3 / 1000)
+                                        if (new Date(value.replace("-", "/").replace("-", "/")) <= new Date(now.replace("-", "/").replace("-", "/"))) {
+                                            layer.tips("所选时间不能小于等于当前时间", '#expirationDate');
+                                            time = false;
+                                            $("#effectiveDate").val("");
+                                        } else {
+                                            time = true;
+                                            $("#effectiveDate").val("课程码在" + days + "天 " + hours + "小时 " + minutes + " 分钟" + seconds + " 秒之后过期");
+                                        }
+                                    }
+                                });
+
+                                form.render();
+
+                                //监听生成课程码提交修改课程码
+                                form.on('submit(coursecode-add)', function (data) {
+                                    if (!time) { layer.tips("所选时间不能小于等于当前时间", '#expirationDate'); } else {
+                                        var models =
+                                        {
+                                            OrganizationId: rowdata.organizationId,
+                                            ProjectId: rowdata.projectId,
+                                            CourseId: rowdata.courseId,
+                                            CourseChildId: rowdata.courseChildId,
+                                            Code: data.field.Code,
+                                            ExpirationDate: data.field.ExpirationDate,
+                                            Id: coursecode.id,
+                                            BeforeCode: data.field.BeforeCode
+                                        };
+                                        common.ajax(setter.apiAddress.coursecode.update, "POST", "", { model: models }, function (res) {
+                                            if (res.statusCode == 200) {
+                                                layer.close(index);
+                                            }
+                                            layer.msg(res.message);
+                                        });
+                                    }
+                                });
+                            }
+                            //不存在课程码
+                            else {
+
+                                //生成课程码切换
+                                $("#coursecode").click(function () {
+                                    console.log('asdasd')
+                                    SaveCode("code");
+                                    if(coursecode.code == ''){
+                                        laydate.render({
+                                            elem: '#expirationDate'
+                                            , type: 'datetime'
+                                            , theme: 'grid'
+                                            , value: new Date(new Date().setMonth(new Date().getMonth() + 1))
+                                            , change: function (value, date) {
+                                                var now = common.nowdate();
+                                                var date3 = new Date(value).getTime() - new Date(now).getTime()//时间差的毫秒数
+                                                var days = Math.floor(date3 / (24 * 3600 * 1000))
+                                                var leave1 = date3 % (24 * 3600 * 1000)//计算天数后剩余的毫秒数
+                                                var hours = Math.floor(leave1 / (3600 * 1000))
+                                                var leave2 = leave1 % (3600 * 1000) //计算小时数后剩余的毫秒数
+                                                var minutes = Math.floor(leave2 / (60 * 1000))
+                                                var leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
+                                                var seconds = Math.round(leave3 / 1000)
+                                                if (new Date(value.replace("-", "/").replace("-", "/")) <= new Date(now.replace("-", "/").replace("-", "/"))) {
+                                                    layer.tips("所选时间不能小于等于当前时间", '#expirationDate');
+                                                    $("#effectiveDate").val("");
+                                                } else {
+                                                    $("#effectiveDate").val("课程码在" + days + "天 " + hours + "小时 " + minutes + " 分钟" + seconds + " 秒之后过期");
+                                                }
+                                            }
+                                        });
+                                    }
+                                    var date=new Date();
+                                    //将当前月份加1，下移到下一个月
+                                    date.setMonth(date.getMonth()+1);
+                                    //将当前的日期置为0，
+                                    date.setDate(0);
+                                    //再获取天数即取上个月的最后一天的天数
+                                    var dayss=date.getDate();
+                                    $("#effectiveDate").val("课程码在" + dayss + "天 0小时 0 分钟0 秒之后过期");
+                                });
+
+                                var time = true;
+                                laydate.render({
+                                    elem: '#expirationDate'
+                                    , type: 'datetime'
+                                    , theme: 'grid'
+                                    , value: new Date(new Date().setMonth(new Date().getMonth() + 1))
+                                    , change: function (value, date) {
+                                        var now = common.nowdate();
+                                        var date3 = new Date(value).getTime() - new Date(now).getTime()//时间差的毫秒数
+                                        var days = Math.floor(date3 / (24 * 3600 * 1000))
+                                        var leave1 = date3 % (24 * 3600 * 1000)//计算天数后剩余的毫秒数
+                                        var hours = Math.floor(leave1 / (3600 * 1000))
+                                        var leave2 = leave1 % (3600 * 1000) //计算小时数后剩余的毫秒数
+                                        var minutes = Math.floor(leave2 / (60 * 1000))
+                                        var leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
+                                        var seconds = Math.round(leave3 / 1000)
+                                        if (new Date(value.replace("-", "/").replace("-", "/")) <= new Date(now.replace("-", "/").replace("-", "/"))) {
+                                            layer.tips("所选时间不能小于等于当前时间", '#expirationDate');
+                                            time = false;
+                                            $("#effectiveDate").val("");
+                                        } else {
+                                            time = true;
+                                            $("#effectiveDate").val("课程码在" + days + "天 " + hours + "小时 " + minutes + " 分钟" + seconds + " 秒之后过期");
+                                        }
+                                    }
+                                });
+
+                                form.render();
+
+                                //监听生成课程码提交
+                                form.on('submit(coursecode-add)', function (data) {
+                                    if (!time) { layer.tips("所选时间不能小于等于当前时间", '#expirationDate'); } else {
+                                        var models =
+                                        {
+                                            OrganizationId: rowdata.organizationId,
+                                            ProjectId: rowdata.projectId,
+                                            CourseId: rowdata.courseId,
+                                            CourseChildId: rowdata.courseChildId,
+                                            Code: data.field.Code,
+                                            ExpirationDate: data.field.ExpirationDate
+                                        };
+                                        common.ajax(setter.apiAddress.coursecode.add, "POST", "", { model: models }, function (res) {
+                                            if (res.statusCode == 200) {
+                                                layer.close(index);
+                                            }
+                                            layer.msg(res.message);
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        } else if (obj.event === 'setuser') {
+            common.ajax(setter.apiAddress.coursecode.checkmodel, "GET", "", {
+                organizationId: rowdata.organizationId,
+                projectId: rowdata.projectId,
+                courseId: rowdata.courseId,
+                courseChildId: rowdata.courseChildId
+            }, function (res) {
+                if (res.statusCode == 200 && res.data.code != '') {
+                    var coursecode = res.data;
+                    //设置用户
+                    admin.popup({
+                        title: '用户管理'
+                        , area: ['90%', '80%']
+                        , resize: false
+                        , success: function (layero, index) {
+                            view(this.id).render('projectcenter/projectimplement/usersetting', rowdata).done(function () {
+                                $("#classId").empty();
+                                common.ajax(setter.apiAddress.classes.list, "Get", "", { organizationId: layui.router().search.organization }, function (res) {
+                                    $("#classId").append("<option value=\"\">请选择班级</option>");
+                                    $.each(res.data, function (index, item) {
+                                        $("#classId").append("<option value=\"" + item.id + "\">" + item.gradeName + item.className + "</option>");
+                                    });
+                                    form.render("select");
+                                });
+                                //渲染所选用户信息列表
+                                table.render({
+                                    elem: '#userconfig-table'
+                                    , id: 'userconfigId'
+                                    , url: setter.apiAddress.projectcourseuser.list
+                                    , cols: [[
+                                        { type: 'checkbox' },
+                                        { field: 'userName', title: '姓名' },
+                                        { field: 'organizationName', title: '机构' },
+                                        { field: 'gradeName', title: '年级', align: 'center' },
+                                        { field: 'className', title: '班级', align: 'center' },
+                                        { field: 'gender', title: '性别', align: 'center' },
+                                        { field: 'birthday', title: '出生日期', align: 'center' },
+                                        { field: 'userCourseCode', title: '课程码', align: 'center' },
+                                        { field: 'expirationDate', title: '过期时间', align: 'center' },
+                                        {
+                                            width: 150, title: '操作', align: 'center'
+                                            , templet: function (d) {
+                                                var htmlButton = new Array();
+                                                htmlButton.push('<div class="layui-btn-group">')
+                                                htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="updatecoursecode"><i class="layui-icon layui-icon-align-edit"></i>课程码</a>');
+                                                htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="userdel"><i class="layui-icon layui-icon-close"></i>删除</a>');
+                                                htmlButton.push('</div>')
+                                                return htmlButton.join('');
+                                            }
+                                        }
+                                    ]]
+                                    , where: {
+                                        courseId: rowdata.courseId,
+                                        courseChildId: rowdata.courseChildId,
+                                        projectId: rowdata.projectId,
+                                        organizationId: rowdata.organizationId
+                                    }
+                                    , page: true
+                                    , text: {
+                                        none: '暂无相关数据'
+                                    }
+                                    , response: {
+                                        statusCode: 200
+                                    }
+                                    , parseData: function (res) {
+                                        return {
+                                            "code": res.statusCode,
+                                            "msg": res.message,
+                                            "count": res.data.totalCount,
+                                            "data": res.data.items
+                                        };
+                                    }
+                                });
+                                //批量删除
+                                $('.layui-btn.btn-configgroup').on('click', function () {
+                                    var checkStatus = table.checkStatus('userconfigId');
+                                    if (checkStatus.data.length > 0) {
+                                        layer.confirm('一共选择' + checkStatus.data.length + '个用户，确定删除？', function (index) {
+                                            var models = [];
+                                            var userconfigdata = checkStatus.data;
+                                            for (var i = 0; i < userconfigdata.length; i++) {
+                                                models.push({ Id: userconfigdata[i].id });
+                                            }
+                                            common.ajax(setter.apiAddress.projectcourseuser.delete, "POST", "", { models: models }, function (res) {
+                                                if (res.statusCode == 200) {
+                                                    layer.close(index);
+                                                    table.reload('userconfigId');
+                                                }
+                                                layer.msg(res.message);
+                                            });
+                                        });
+                                    } else {
+                                        layer.msg("请选择用户");
+                                    }
+                                });
+                                //搜索
+                                $('.layui-btn.btn-user-search').on('click', function () {
+                                    table.reload('userconfigId', {
+                                        where: {
+                                            courseId: rowdata.courseId,
+                                            courseChildId: rowdata.courseChildId,
+                                            projectId: rowdata.projectId,
+                                            organizationId: rowdata.organizationId,
+                                            classesId: $("#classId").val()
+                                        },
+                                        page: {
+                                            curr: 1 //重新从第 1 页开始
+                                        }
+                                    });
+                                });
+                                //监听所选用户列表事件
+                                table.on('tool(userconfig-table)', function (obj) {
+                                    var rowuserdata = obj.data;
+                                    if (obj.event === 'userdel') {
+                                        layer.confirm('确定删除？', function (index) {
+                                            if (rowuserdata.id != "") {
+                                                var models = [];
+                                                models.push({ Id: rowuserdata.id });
+                                                common.ajax(setter.apiAddress.projectcourseuser.delete, "POST", "", { models: models }, function (res) {
+                                                    if (res.statusCode == 200) {
+                                                        layer.close(index);
+                                                        table.reload('userconfigId');
+                                                    }
+                                                    layer.msg(res.message);
+                                                });
+                                            } else { layer.msg("删除数据异常"); }
+                                        });
+                                    } else if (obj.event === 'updatecoursecode') {
+                                        layer.confirm('确定为[' + rowuserdata.userName + ']生成新的课程码？', function (index) {
+                                            if (rowuserdata.id != "") {
+                                                //保存课程码
+                                                function SaveUserCode() {
+                                                    var code = CreateCourseCode();
+                                                    common.ajax(setter.apiAddress.projectcourseuser.checkcourescode, "GET", "", { userCoursCode: code }, function (res) {
+                                                        if (res.statusCode == 200) {
+                                                            common.ajax(setter.apiAddress.projectcourseuser.updatecoursecode, "POST", "", { id: rowuserdata.id, userCourseCode: code }, function (res) {
+                                                                if (res.statusCode == 200) {
+                                                                    layer.close(index);
+                                                                    table.reload('userconfigId');
+                                                                }
+                                                                layer.msg(res.message);
+                                                            });
+                                                        } else {
+                                                            SaveUserCode();
+                                                        }
+                                                    });
+                                                }
+                                                SaveUserCode();
+                                            } else { layer.msg("数据异常"); }
+                                        });
+                                    }
+                                });
+
+                                //用户切换到可选用户
+                                element.on('tab(user-tab)', function (data) {
+                                    if (data.index == 1) {
+                                        //渲染题目列表
+                                        table.render({
+                                            elem: '#user-table'
+                                            , id: 'userId'
+                                            , url: setter.apiAddress.userprofile.list
+                                            , cols: [[
+                                                { type: 'checkbox' },
+                                                { field: 'realName', title: '姓名' },
+                                                {
+                                                    field: 'orgId', title: '机构', templet: function (d) {
+                                                        if (d.organizationDto == null) {
+                                                            return "";
+                                                        }
+                                                        return d.organizationDto.name;
+                                                    }
+                                                },
+                                                {
+                                                    field: 'gradeName', title: '年级', align: 'center', templet: function (d) {
+                                                        if (d.gradeClassDto == null) {
+                                                            return "";
+                                                        }
+                                                        return d.gradeClassDto.gradeName;
+                                                    }
+                                                },
+                                                {
+                                                    field: 'classId', title: '班级', align: 'center', templet: function (d) {
+                                                        if (d.gradeClassDto == null) {
+                                                            return "";
+                                                        }
+                                                        return d.gradeClassDto.className;
+                                                    }
+                                                },
+                                                {
+                                                    field: 'gender', title: '性别', align: 'center'
+                                                },
+                                                { field: 'birthday', title: '出生日期', align: 'center' }
+                                            ]]
+                                            , where: {
+                                                organizationId: rowdata.organizationId,
+                                                status: 1
+                                            }
+                                            , page: true
+                                            , limits: [10, 20, 50, 100, 500, 1000]
+                                            , text: {
+                                                none: '暂无相关数据'
+                                            }
+                                            , response: {
+                                                statusCode: 200
+                                            }
+                                            , parseData: function (res) {
+                                                return {
+                                                    "code": res.statusCode,
+                                                    "msg": res.message,
+                                                    "count": res.data.totalCount,
+                                                    "data": res.data.items
+                                                };
+                                            }
+                                        });
+                                        $("#class-search-sel").empty();
+                                        common.ajax(setter.apiAddress.classes.list, "GET", "", { organizationId: layui.router().search.organization }, function (res) {
+                                            $("#class-search-sel").append("<option value=\"\">请选择班级</option>");
+                                            $.each(res.data, function (index, item) {
+                                                $("#class-search-sel").append("<option value=\"" + item.id + "\">" + item.gradeName + item.className + "</option>");
+                                            });
+                                            form.render("select");
+                                        });
+                                        //搜索
+                                        // $('.layui-btn.btn-search').on('click', function () {
+                                        //     //执行重载
+                                        //     table.reload('userId', {
+                                        //         where: {
+                                        //             organizationId: layui.router().search.organization,
+                                        //             classId: $("#class-search-sel").val(),
+                                        //             gradeName: $("#gradeName").val(),
+                                        //         },
+                                        //         page: {
+                                        //             curr: 1 //重新从第 1 页开始
+                                        //         }
+                                        //     });
+                                        // });
+                                        form.on('submit(user-search)', function (data) {
+                                            //执行重载
+                                            table.reload('userId', {
+                                                where: {
+                                                    gradeName: $("#gradeName").val(),
+                                                    // organizationId: layui.router().search.organization,
+                                                    classId: $("#class-search-sel").val(),
+                                                },
+                                                page: {
+                                                    curr: 1 //重新从第 1 页开始
+                                                }
+                                            });
+                                        });
+
+                                        $('.layui-btn.btn-usersave').on('click', function () {
+                                            var checkStatus = table.checkStatus('userId');
+                                            if (checkStatus.data.length > 0) {
+                                                layer.confirm('一共选择（' + checkStatus.data.length + '）个用户，确定添加？', function (index) {
+                                                    var models = [];
+                                                    var userdata = checkStatus.data;
+                                                    for (var i = 0; i < userdata.length; i++) {
+                                                        models.push({
+                                                            OrganizationId: userdata[i].orgId,
+                                                            ClassesId: userdata[i].classId,
+                                                            CourseId: rowdata.courseId,
+                                                            CourseChildId: rowdata.courseChildId,
+                                                            UserId: userdata[i].id,
+                                                            UserName: userdata[i].realName,
+                                                            Gender: userdata[i].gender,
+                                                            Birthday: userdata[i].birthday,
+                                                            OrganizationName: userdata[i].organizationDto.name,
+                                                            GradeName: userdata[i].gradeClassDto.gradeName,
+                                                            ClassName: userdata[i].gradeClassDto.className,
+                                                            ProjectId: rowdata.projectId,
+                                                            UserCourseCode: coursecode.code,
+                                                            ExpirationDate: coursecode.expirationDate
+                                                        });
+                                                    }
+                                                    common.ajax(setter.apiAddress.projectcourseuser.add, "POST", "", { models: models }, function (res) {
+                                                        if (res.statusCode == 200) {
+                                                            element.tabChange('user-tab', '0');
+                                                            table.reload('userconfigId');
+                                                        }
+                                                        layer.msg(res.message);
+                                                    });
+                                                });
+                                            } else {
+                                                layer.msg("请选择用户");
+                                            }
+                                        });
+                                    } else if (data.index == 1) { table.reload('userconfigId'); }
+
+                                });
+                            });
+                        }
+                    });
+                } else {
+                    layer.msg("请先设置该课时的课程码");
+                }
+            });
+        }
+    });
+    exports('projectimplementcourses', {})
+});

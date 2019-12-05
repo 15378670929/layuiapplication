@@ -1,0 +1,34 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="client-edit-form" lay-filter="client-edit-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务名称</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="clientName" value="{{ d.params.clientName || '' }}" lay-verify="required" maxlength="30" placeholder="" autocomplete="off" class="layui-input">
+                <input type="hidden" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务地址</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="clientUri" value="{{ d.params.clientUri || '' }}" lay-verify="required|url" maxlength="100" placeholder="" autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">服务描述</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" name="description" value="{{ d.params.description || '' }}" lay-verify="required" maxlength="100" placeholder="" autocomplete="off" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-submit lay-filter="client-form-submit"> 保存</button>
+    </div>
+</form>

@@ -1,0 +1,61 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="abilityclass-form" action="" lay-filter="abilityclass-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label ">数据标识</label>
+        <div class="layui-input-block">
+            <select class="sel" id="dataIdentification" name="DataIdentification" lay-filter="" lay-verify="required|select">
+                <option value="">请选择数据标识</option>
+                <option value="1">基础能力</option>
+                <option value="2">学科能力</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">等级分类</label>
+        <div class="layui-input-block ">
+            <input type="text" id="abilityClassification" name="AbilityClassification" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">等级名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="abilityName" name="AbilityName" lay-verify="required|specialCharacters" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">最小分值</label>
+        <div class="layui-input-block">
+            <input type="text" placeholder="" id="minScore" name="MinScore" maxlength="10" lay-verify="required|score|decimalplaces" maxlength="20" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">最大分值</label>
+        <div class="layui-input-block">
+            <input type="text" placeholder="" id="maxScore" name="MaxScore" maxlength="10" lay-verify="required|score|decimalplaces" maxlength="20" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">数据版本</label>
+        <div class="layui-input-block">
+            <input type="text" id="dataVersion" name="DataVersion" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label ">显示顺序</label>
+        <div class="layui-input-block">
+            <input type="text" id="displayOrder" name="DisplayOrder" lay-verify="required|mainnumber" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注信息</label>
+        <div class="layui-input-block">
+            <textarea placeholder="" id="remark" name="Remark" lay-verify="" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="abilityclass-add-form-submit">保存</button>
+    </div>
+</form>

@@ -1,0 +1,39 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="reporttemplate-add-form" lay-filter="reporttemplate-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" id="name" name="Name" lay-verify="required|specialCharacters" maxlength="15" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <select class="sel" id="typeId" name="TypeId" lay-filter="typename" lay-verify="required|select"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <select class="sel" id="status" name="Status" lay-filter="" lay-verify="required|select">
+                <option value="">请选择状态</option>
+                <option value="0">删除</option>
+                <option value="1">新建</option>
+                <option value="2">测试中</option>
+                <option value="3">已发布</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">内容</label>
+        <div class="layui-input-block">
+            <textarea placeholder="" id="context" name="Context" lay-verify="required" class="layui-textarea templatetype-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="reporttemplate-form-submit">保存</button>
+    </div>
+</form>

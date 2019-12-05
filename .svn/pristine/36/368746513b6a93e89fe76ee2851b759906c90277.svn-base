@@ -1,0 +1,32 @@
+﻿<title>系统模块管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a href="#/settings/roles/index"><cite>系统角色</cite></a>
+        <a><cite>角色权限</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="dicability-search">
+            <div class="layui-form-item">
+                <button class="layui-btn btn-save-permissions" data-type="add">保存</button>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="sysmodules-table" lay-filter="sysmodules-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('permissionsettings', layui.factory('permissionsettings')).use(['permissionsettings'], function () {
+
+    });
+</script>

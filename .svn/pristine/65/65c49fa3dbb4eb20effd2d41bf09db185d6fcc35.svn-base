@@ -1,0 +1,224 @@
+﻿<title>题目壳管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a><cite>题目壳管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="questions-group-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="abtype-search-sel" name="abtype-search-sel" lay-filter="abtype-search-filter"></select>
+                </div>
+                <div class="layui-inline">
+                    <select class="sel" id="firstabtype-search-sel" name="firstabtype-search-sel" lay-filter="firstabtype-search-filter"></select>
+                </div>
+                <div class="layui-inline">
+                    <select class="sel" id="secondabtype-search-sel" name="secondabtype-search-sel"></select>
+                </div>
+                <div class="layui-inline">
+                    <select class="sel" id="statusabtype-search-sel" name="statusabtype-search-sel" lay-filter="statusabtype-search-filter">
+                        <option value="">请选择状态</option>
+                        <option value="true">启用</option>
+                        <option value="false">禁用</option>
+                    </select>
+                </div>
+                <!-- <label class="layui-form-label">搜索</label> -->
+                <div class="layui-inline">
+                    <button class="layui-btn btn-questions-group" lay-submit lay-filter="questions-group-search">搜索</button>
+                    <button class="layui-btn btn-questions-group" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="questions-group-table" lay-filter="questions-group-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('questiongroup', layui.factory('questiongroup')).use(['admin', 'laydate', 'table', 'common', 'setter', 'layer', 'questiongroup', 'verification', 'upload'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , common = layui.common
+            , upload = layui.upload
+            , form = layui.form;
+
+        //搜索
+        form.on('submit(questions-group-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('questions-group-table', {
+                where: {
+                    abilityTypeId: $("#abtype-search-sel").val(),
+                    firstAbilityId: $("#firstabtype-search-sel").val(),
+                    secondAbilityId: $("#secondabtype-search-sel").val(),
+                    status: $("#statusabtype-search-sel").val()
+                },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+        $("#firstabtype-search-sel").append("<option value=''>请选择一级能力</option>");
+        $("#secondabtype-search-sel").append("<option value=''>请选择二级能力</option>");
+        var pageInit = {
+            //能力类型
+            initAbilityType: function (id) {
+                common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: '', level: 0 }, function (res) {
+                    $("#" + id).append("<option value=''>请选择能力类型</option>");
+                    $.each(res.result, function (index, item) {
+                        $("#" + id).append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                    });
+                    form.render("select");
+                });
+            },
+            initFirstAbilities: function (id, data) {
+                if (data.value != "") {
+                    common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                        $("#" + id).append("<option value=''>请选择一级能力</option>");
+                        $.each(res.result, function (index, item) {
+                            $("#" + id).append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                        });
+                        form.render("select");
+                    });
+                } else {
+                    common.select(id, [{ id: "", name: "" }], 1, 1);
+                    form.render("select");
+                }
+            },
+            initSecondAbilities: function (id, data) {
+                if (data.value != "") {
+                    common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                        $("#" + id).append("<option value=''>请选择二级能力</option>");
+                        $.each(res.result, function (index, item) {
+                            $("#" + id).append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                        });
+                        form.render("select");
+                    });
+                } else {
+                    common.select(id, [{ id: "", name: "" }], 1, 1);
+                    form.render("select");
+                }
+            },
+        };
+
+        pageInit.initAbilityType("abtype-search-sel");
+
+        form.on('select(abtype-search-filter)', function (data) {
+            $("#firstabtype-search-sel").empty();
+            $("#secondabtype-search-sel").empty();
+            $("#secondabtype-search-sel").append("<option value=''>请选择二级能力</option>");
+            pageInit.initFirstAbilities("firstabtype-search-sel", data);
+        });
+        form.on('select(firstabtype-search-filter)', function (data) {
+            $("#secondabtype-search-sel").empty();
+            pageInit.initSecondAbilities("secondabtype-search-sel", data);
+        });
+
+        //普通图片上传
+        function uploadInst(id, showicon, icon) {
+            upload.render({
+                elem: '#' + id
+                , url: setter.apiAddress.image.imageupload+"?filePath=content/questiongroup/add"
+                , field: "imgFile"
+                , accept: 'file'
+                , size: 2048
+                , exts: 'jpg|png'
+                , before: function (obj) {
+                    obj.preview(function (index, file, result) {
+                        $('#' + showicon).attr('src', result);
+                        $('#' + showicon).attr('width', '80px');
+                    });
+                }
+                , done: function (res) {
+                    if (res.code == 200) {
+                        $("#" + icon).val(res.data.src);
+                        layer.msg(res.msg);
+                    }
+                }
+                , error: function (e) {
+                    layer.msg("上传失败!");
+                }
+            });
+        }
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['50%', '98%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('content/questiongroup/add').done(function () {
+                            // 获取算分码
+                            common.ajax(setter.apiAddress.calculatecode.loadall, "Get", "", {}, function (res) {
+                                $.each(res.result, function (index, item) {
+                                    $("#code").append("<option value=\"" + item.id + "\">" + item.code + "</option>");
+                                });
+                                form.render("select");
+                            });
+                            //选择算分码
+                            form.on('select(codefilter)', function (data) {
+                                $("#calculateCode").val(data.elem[data.elem.selectedIndex].text);
+                            });
+                            //题目壳模板
+                            common.ajax(setter.apiAddress.questiongrouptemplate.loadall, "GET", "", {}, function (res) {
+                                common.select("grouptemplateId", res.result, "", 1);
+                                form.render("select");
+                            });
+                            //时间选择器
+                            laydate.render({
+                                elem: '#endTime'
+                                , type: 'time'
+                            });
+                            pageInit.initAbilityType("abilityType");
+                            form.on('select(abilityType-filter)', function (data) {
+                                $("#firstAbilities").empty();
+                                $("#secondAbilities").empty();
+                                pageInit.initFirstAbilities("firstAbilities", data);
+                            });
+                            form.on('select(firstAbilities-filter)', function (data) {
+                                $("#secondAbilities").empty();
+                                pageInit.initSecondAbilities("secondAbilities", data);
+                            });
+                            uploadInst("uploadicon", "showicon", "icon");
+                            uploadInst("uploadcoverPlanUri", "showcoverPlanUri", "coverPlanUri");
+                            form.render(null, 'questiongroup-add-form');
+                            //新增
+                            form.on('submit(questiongroup-add-form-submit)', function (data) {
+                                if ($("#icon").val() == "" || $("#coverPlanUri").val() == "") {
+                                    layer.msg("请上传图片");
+                                } else {
+                                    common.ajax(setter.apiAddress.questiongroup.add, "POST", "", data.field, function (res) {
+                                        if (res.statusCode == 200) {
+                                            table.reload('questions-group-table');
+                                            layer.close(index);
+                                        }
+                                        layer.msg(res.message);
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        };
+
+        $('.layui-btn.btn-questions-group').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

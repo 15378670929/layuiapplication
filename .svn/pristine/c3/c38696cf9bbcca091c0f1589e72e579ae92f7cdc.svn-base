@@ -1,0 +1,58 @@
+﻿/**
+ @Name：机构报告模板配置
+ */
+layui.define(['table', 'form', 'common', 'setter', 'verification'], function (exports) {
+    var $ = layui.$
+        , table = layui.table
+        , setter = layui.setter
+
+    table.render({
+        elem: '#reportconfig-table'
+        , url: setter.apiAddress.organization.list
+        , cols: [[
+            { field: 'name', title: '机构名称' },
+            {
+                title: '地址', sort: false, templet: function (d) {
+                    return d.province + d.city + d.district + d.address;
+                }
+            },
+            {
+                width: 120, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="config"><i class="layui-icon layui-icon-set"></i>模板管理</a>');
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: true
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.data.totalCount,
+                "data": res.data.items
+            };
+        }
+    });
+
+    //跳转到配置页面
+    table.on('tool(reportconfig-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'config') {
+            location.hash = '/report/reportconfig/templatesetting/organization=' + data.id;
+        }
+    });
+
+    exports('reportconfig', {})
+});

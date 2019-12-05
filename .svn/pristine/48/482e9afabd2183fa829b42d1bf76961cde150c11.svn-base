@@ -1,0 +1,50 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="course-add-form" lay-filter="course-add-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">课时</label>
+        <div class="layui-input-block ">
+            <input type="hidden" id="courseId" name="CourseId" lay-verify="required" class="layui-input">
+            <input type="text" id="Name" name="Name" lay-verify="required|normallength" maxlength="30" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">版本</label>
+        <div class="layui-input-block ">
+            <input type="text" id="Version" name="Version" lay-verify="required|versions" maxlength="10" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block ">
+            <input type="text" id="Order" name="DisplayOrder" lay-verify="required|positive" maxlength="2" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <select class="sel" id="courseClass" name="CourseClass" lay-filter="" lay-verify="required|select">
+                <option value="">请选择课时类型</option>
+                <option value="1">测评课时</option>
+                <option value="2">训练课时</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block ">
+            <input type="text" id="remark" name="Remark" maxlength="100" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Status" value="true" title="启用" checked>
+            <input type="radio" name="Status" value="false" title="禁用">
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button type="button" class="layui-btn" lay-filter="childrencourse-add-form-submit" lay-submit="childrencourse-add-form-submit">保存</button>
+    </div>
+</form>

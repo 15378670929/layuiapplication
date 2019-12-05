@@ -1,0 +1,202 @@
+﻿/**
+ @Name：系统模块管理
+ */
+layui.define(['form', 'common', 'setter', 'treeGrid', 'treeSelect', 'table', 'element'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , treeGrid = layui.treeGrid
+        , treeSelect = layui.treeSelect
+        , element = layui.element
+        , form = layui.form;
+
+    treeGrid.set({ headers: { Authorization: "Bearer " + sessionStorage.access_token } });
+
+    //系统模块树型表格
+    treeGrid.render({
+        id: "sysmodules-table"
+        , elem: '#sysmodules-table'
+        , url: setter.apiAddress.clientmodules.list
+        , idField: 'id'
+        , treeId: 'id'
+        , treeUpId: 'parentId'
+        , treeShowName: 'name'
+        , isFilter: false
+        , iconOpen: false
+        , isOpenDefault: true
+        , loading: true
+        , method: 'get'
+        , isPage: false
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , cols: [[
+            { field: 'name', title: '模块名称', sort: false }
+            , { field: 'descText', title: '描述', sort: false }
+            , { field: 'redirectUri', title: '跳转地址', sort: false }
+            , {
+                field: 'isEnable', title: '状态', align: 'center', width: 100,
+                templet: function (d) { return d.isEnable == 1 ? '<span style="color:#009688;">启用</span>' : '<span style="color:#FF5722;">禁用</span>'; }
+            }
+            , {
+                field: 'icon', title: 'Icon', align: 'center', width: 100,
+                templet: function (d) { return '<i class="layui-icon ' + d.icon + '"></i>'; }
+            }
+            , { field: 'displayOrder', title: '显示顺序', width: 100, sort: false, align: 'center' }
+            , {
+                width: 260, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>');
+                    if (d.isEnable) {
+                        htmlButton.push('<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-close"></i>禁用</a>');
+                    } else {
+                        htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                    }
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="buttons"><i class="layui-icon layui-icon-edit"></i>按钮</a>');
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , parseData: function (res) {
+            return {
+                "code": res.code,
+                "msg": res.message,
+                "data": res.result
+            };
+        }
+    });
+
+    //监听模块表格事件
+    treeGrid.on('tool(sysmodules-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'changestatus') {
+            var titletext = "确认禁用？";
+            if (!data.status) {
+                titletext = "确认启用？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.clientmodules.updatestatus, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        treeGrid.reload('sysmodules-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'del') {
+            layer.confirm('确定删除？', function (index) {
+                common.ajax(setter.apiAddress.clientmodules.delete, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        treeGrid.reload('sysmodules-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === "edit") {
+            admin.popup({
+                title: '编辑系统功能模块'
+                , area: ['50%', '55%']
+                , resize: false
+                , success: function (layero, index) {
+                    view(this.id).render('settings/sysmodules/edit', data).done(function () {
+                        initTree("module-edit-select-tree", data.parentId);
+                        form.render();
+                        common.ajax(setter.apiAddress.client.list, "Get", "", {}, function (res) {
+                            $("#edit-clientId").append("<option value=\"\">请选择应用</option>");
+                            $.each(res.result, function (index, item) {
+                                if (obj.data.clientId == item.id) {
+                                    $("#edit-clientId").append("<option value=\"" + item.id + "\" selected=\"selected\">" + item.clientName + "</option>");
+                                } else {
+                                    $("#edit-clientId").append("<option value=\"" + item.id + "\">" + item.clientName + "</option>");
+                                }
+                            });
+                            form.render("select");
+                        });
+
+                        form.on('submit(modules-edit-form-submit)', function (data) {
+                            common.ajax(setter.apiAddress.clientmodules.update, "POST", "", $('#modules-edit-form').serialize(), function (res) {
+                                if (res.statusCode == 200) {
+                                    layer.close(index);
+                                    treeGrid.reload('sysmodules-table');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    });
+                }
+            });
+        } else if (obj.event === "buttons") {
+            location.hash = '/settings/sysmodules/modulebuttons/module=' + data.id;
+        }
+    });
+
+    //添加模块事件
+    $("#btn-add-sysmodules").click(function () {
+        admin.popup({
+            title: '添加系统功能模块'
+            , area: ['50%', '55%']
+            , resize: false
+            , success: function (layero, index) {
+                view(this.id).render('settings/sysmodules/add').done(function () {
+                    initTree("module-select-tree", "");
+                    common.ajax(setter.apiAddress.client.list, "Get", "", {}, function (res) {
+                        $("#add-clientId").append("<option value=\"\">请选择应用</option>");
+                        $.each(res.result, function (index, item) {
+                            $("#add-clientId").append("<option value=\"" + item.id + "\">" + item.clientName + "</option>");
+                        });
+                        form.render("select");
+                    });
+                    form.render(null, "modules-add-form");
+                    form.on('submit(modules-form-submit)', function (data) {
+                        common.ajax(setter.apiAddress.clientmodules.add, "POST", "", data.field, function (res) {
+                            if (res.statusCode == 200) {
+                                layer.close(index);
+                                treeGrid.reload('sysmodules-table');
+                            }
+                            layer.msg(res.message);
+                        });
+                    });
+                });
+            }
+        });
+    });
+
+    function initTree(elementId, nodeId) {
+        treeSelect.render({
+            elem: "#" + elementId,
+            url: setter.apiAddress.clientmodules.treelist,
+            type: 'get',
+            placeholder: '请选择所属系统模块',
+            style: {
+                folder: {
+                    enable: true
+                },
+                line: {
+                    enable: true
+                }
+            },
+            search: true,
+            click: function (data) {
+                $("#parentId").val(data.current.id);
+                $("#clientId").val(data.current.clientId);
+            },
+            success: function (data) {
+                treeObj = treeSelect.zTree(elementId);
+                var defaultNode = { id: "00000000-0000-0000-0000-000000000000", name: "添加一级系统模块" };
+                treeObj.addNodes(null, 0, defaultNode);
+                if (nodeId != "") {
+                    var node = treeObj.getNodeByParam('id', nodeId);
+                    treeObj.selectNode(node, true);
+                    treeObj.checkNode(node, true, true);
+                    $(".layui-unselect").val(node.name);
+                }
+            }
+        });
+    }
+
+    exports('sysmodules', {})
+});

@@ -1,0 +1,61 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<form class="layui-form" id="formData" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择机构</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="orgId" name="OrgId" lay-verify="required|select" lay-filter="org-add-filter"></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选择班级</label>
+        <div class="layui-input-block ">
+            <select class="sel" id="classId" name="ClassId" lay-verify="required|select" lay-filter=""></select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block ">
+            <input type="text" id="realName" name="RealName" maxlength="10" lay-verify="required|chineselength" autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">学号</label>
+        <div class="layui-input-block">
+            <input type="text" id="studentNumber" maxlength="20" name="StudentNumber" lay-verify="numenglishIstrue"  autocomplete="off" placeholder="" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">身份证号码</label>
+        <div class="layui-input-block">
+            <input type="text" id="idCard" name="IdCard" maxlength="18" lay-verify="idcardIstrue" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">手机号</label>
+        <div class="layui-input-block">
+            <input type="text" id="mobile" name="Mobile" maxlength="11" lay-verify="isPhoneNumber" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">出生日期</label>
+        <div class="layui-input-block">
+            <input type="text" id="birthday" name="Birthday" readonly="readonly" lay-verify="required|nowdate" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="Gender" checked value="男" title="男">
+            <input type="radio" name="Gender" value="女" title="女" >
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" type="button" lay-submit lay-filter="userprofile-form-submit">保存</button>
+    </div>
+</form>
+<script type="text/javascript">
+
+</script>

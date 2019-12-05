@@ -1,0 +1,33 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<form class="layui-form" id="apiresource-edit-form" lay-filter="apiresource-edit-form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">资源名称</label>
+        <div class="layui-input-block ">
+            <script type="text/html" template>
+                <input type="text" name="name" value="{{ d.params.name || '' }}" lay-verify="required|normallength" maxlength="30" placeholder="" autocomplete="off" class="layui-input">
+                <input type="hidden" name="id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">显示名称</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="displayName" name="displayName" value="{{ d.params.displayName || '' }}" maxlength="30" lay-verify="required|normallength" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label lines">资源描述</label>
+        <div class="layui-input-block">
+            <script type="text/html" template>
+                <input type="text" id="description" name="description" value="{{ d.params.description || '' }}" maxlength="100" lay-verify="required|describelength" autocomplete="off" placeholder="" class="layui-input">
+            </script>
+        </div>
+    </div>
+    <div class="layui-form-item content-center">
+        <button class="layui-btn" id="btn-save" type="button" lay-filter="apiresource-form-submit" lay-submit="client-form-submit">保存</button>
+    </div>
+</form>

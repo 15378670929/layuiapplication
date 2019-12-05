@@ -1,0 +1,276 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a href="#/content/question/index"><cite>题目管理</cite></a>
+        <a><cite>编辑题目</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card padding15">
+        <form class="layui-form" id="question-edit-form" lay-filter="question-edit-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目类型</label>
+                <div class="layui-input-block ">
+                    <select id="QuestionType" name="QuestionType" lay-filter="questionType-filter">
+                        <option value="1" selected="">单选题</option>
+                        <option value="2">多选题</option>
+                        <option value="3">量表题</option>
+                        <option value="4">矩阵单选</option>
+                        <option value="5">矩阵多选</option>
+                        <option value="6">矩阵量表</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目名称</label>
+                <div class="layui-input-block ">
+                    <script type="text/html" template>
+                        <input type="hidden" id="Id" name="Id" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                        <textarea class="layui-textarea" id="name" name="Name" lay-verify="required">{{ d.params.name || '' }}</textarea>
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-normal" id="uploadImg"><i class="layui-icon"></i>上传图片</button>
+                    <div class="layui-inline layui-word-aux">
+                        图标大小为2M以内，格式为jpg | png。
+                    </div>
+                    <script type="text/html" template>
+                        {{# if(d.params.attachmentUrl!=null&&d.params.attachmentUrl!=""){ }}
+                        <img class="layui-upload-img" id="showImg" src="{{ d.params.attachmentUrl || '' }}?x-oss-process=image/resize,h_50,w_50">
+                        {{# }else{ }}
+                        <img class="layui-upload-img" id="showImg">
+                        {{# } }}
+                        <input type="hidden" name="AttachmentUrl" id="attachmentUrl" value="{{ d.params.attachmentUrl || '' }}" placeholder="" lay-verify="" autocomplete="off" class="layui-input">
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目版本</label>
+                <div class="layui-input-block ">
+                    <script type="text/html" template>
+                        <input type="text" id="Version" name="Version" value="{{ d.params.version || '' }}" lay-verify="required|versions" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">难度系数</label>
+                <div class="layui-input-block ">
+                    <script type="text/html" template>
+                        <input type="text" id="DegreeOfDifficulty" name="DegreeOfDifficulty" value="{{ d.params.degreeOfDifficulty || '' }}" lay-verify="required" onkeyup="var p2 = parseFloat(value).toFixed(2);value = p2>0?(/\.0?$/.test(value)?value:p2.replace(/0$/,'').replace(/\.0$/,'')):''" onblur="value = value.replace(/\.0*$/,'')" maxlength="5" autocomplete="off" placeholder="" class="layui-input">
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">能力类型</label>
+                <div class="layui-input-inline ">
+                    <select id="abilityType" name="abilityType" lay-verify="required|select" lay-filter="abilityType-filter"></select>
+                </div>
+                <div class="layui-input-inline ">
+                    <select id="firstAbilities" name="firstAbilities" lay-verify="required|select" lay-filter="firstAbilities-filter"></select>
+                </div>
+                <div class="layui-input-inline ">
+                    <select id="secondAbilities" name="secondAbilities" lay-verify="required|select"></select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">备注信息</label>
+                <div class="layui-input-block ">
+                    <script type="text/html" template>
+                        <input type="text" id="Remark" name="Remark" value="{{ d.params.remark || '' }}" maxlength="100" lay-verify="remarktext" autocomplete="off" placeholder="" class="layui-input">
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目解析</label>
+                <div class="layui-input-block ">
+                    <script type="text/html" template>
+                        <textarea id="Analysis" name="Analysis" maxlength="200" lay-verify="analysistext" class="layui-textarea">{{ d.params.analysis || '' }}</textarea>
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item" id="rowtitle_table">
+                <label class="layui-form-label">行标题</label>
+                <div class="layui-input-block">
+                    <script type="text/html" template>
+                        <textarea id="questionrowtitle" name="questionrowtitle" maxlength="200" class="layui-textarea">{{ d.params.analysis || '' }}</textarea>
+                    </script>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">题目选项</label>
+                <div class="layui-input-block">
+                    <button type="button" class="layui-btn layui-btn-xs btn-questions-manage" data-type="additems"><i class="layui-icon"></i>添加选项</button>
+                </div>
+                <div class="layui-input-block">
+                    <table class="question-add-table">
+                        <thead>
+                            <tr>
+                                <th>标题</th>
+                                <th>分值</th>
+                                <th>是否正确答案</th>
+                                <th>显示顺序</th>
+                                <th>附件</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody_items"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="layui-form-item content-center">
+                <button type="button" class="layui-btn" lay-filter="question-edit-form-submit" lay-submit="question-edit-form-submit">保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    layui.use(['upload', 'setter', 'form', 'verification', 'element', 'question', 'layedit'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form
+            , element = layui.element
+            , common = layui.common
+            , layedit = layui.layedit
+            , upload = layui.upload;
+        layedit.set({
+            uploadImage: {
+                url: setter.apiAddress.image.imageeditupload//接口url
+                , type: 'post' //默认post
+            }
+        });
+        $("#rowtitle_table").hide();
+        form.on('select(questionType-filter)', function (data) {
+            var questionTypeVal = data.value;
+            if (questionTypeVal == 4 || questionTypeVal == 5 || questionTypeVal == 6) {
+                $("#rowtitle_table").show();
+            } else {
+                $("#rowtitle_table").hide();
+            }
+        });
+
+        //表单验证
+        form.verify({
+            remarktext: [
+                /^[\S]{0,200}$/
+                , '备注最多200个字符，且不能出现空格'
+            ],
+            analysistext: [
+                /^[\S]{0,200}$/
+                , '题目解析最多200个字符，且不能出现空格'
+            ],
+        });
+
+        var initPage = {
+            initDeleteButtonEvent: function (btnId) {
+                $("#delete_" + btnId).click(function (obj) {
+                    $("#tr_" + btnId).remove();
+                });
+                $("#tbody_items input[name='displayOrder']").keyup(function () {
+                    var c = $(this);
+                    if (/[^\d]/.test(c.val())) {
+                        var temp_amount = c.val().replace(/[^\d]/g, '');
+                        $(this).val(temp_amount);
+                    }
+                });
+                $("#tbody_items input[name='score']").keyup(function () {
+                    var c = $(this);
+                    if (/[^\d]/.test(c.val())) {
+                        var temp_amount = c.val().replace(/[^\d]/g, '');
+                        $(this).val(temp_amount);
+                    }
+                })
+            },
+            initUploadEvent: function (id) {
+                //图片上传
+                var uploadInst = upload.render({
+                    elem: '#upbtn_' + id
+                    , url: setter.apiAddress.image.imageupload+"?filePath=content/question/edit"
+                    , field: "imgFile"
+                    , accept: 'file'
+                    , size: 10240
+                    , exts: 'jpg|png'
+                    , before: function (obj) {
+                        obj.preview(function (index, file, result) {
+                            $('#upimg_' + id).attr('src', result); //图片链接（base64）
+                        });
+                    }
+                    , done: function (res) {
+                        if (res.code == 200) {
+                            $("#itemimg_" + id).val(res.data.src);
+                            layer.msg(res.msg);
+                        }
+                    }
+                    , error: function () {
+                        var demoText = $('#uptext_' + id);
+                        demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                        demoText.find('.demo-reload').on('click', function () {
+                            uploadInst.upload();
+                        });
+                    }
+                });
+            }
+        }
+        var active = {
+            //动态生成选项
+            additems: function () {
+                var rowCount = common.guid();
+                var itemArr = new Array();
+                itemArr.push('<tr id="tr_' + rowCount + '">');
+                itemArr.push('<td>');
+                itemArr.push('<input type="text" name="itemTitle" autocomplete="off" maxlength="200" placeholder="请输入标题" class="layui-input">');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<input type="text" name="score" autocomplete="off" maxlength="2" value="0" placeholder="请输入分值" class="layui-input">');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<select name="isRightChoice' + rowCount + '"> ');
+                itemArr.push('<option value = "false" selected = "" >否</option >');
+                itemArr.push('<option value="true">是</option>');
+                itemArr.push('</select >');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<input type="text" name="displayOrder" maxlength="1" value="0" placeholder="请输入显示顺序" class="layui-input">');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<input type="hidden" name="itemAttachmentUrl" id="itemimg_' + rowCount + '" class="layui-input">');
+                itemArr.push('<div class="layui-upload">');
+                itemArr.push('<button type="button" class="layui-btn layui-btn-xs" id="upbtn_' + rowCount + '">上传图片</button>');
+                itemArr.push('<img class="layui-upload-img" id="upimg_' + rowCount + '">');
+                itemArr.push('<p id="uptext_' + rowCount + '"></p>');
+                itemArr.push('</div>');
+                itemArr.push('');
+                itemArr.push('');
+                itemArr.push('</td>');
+
+                itemArr.push('<td>');
+                itemArr.push('<button id="delete_' + rowCount + '" type="button" class="btn-delete layui-btn layui-btn-sm layui-btn-danger" rownumber="' + rowCount + '"><i class="layui-icon layui-icon-delete"></i></button>');
+                itemArr.push('</td>');
+
+                itemArr.push('</tr> ');
+                $("#tbody_items").append(itemArr.join(''));
+                form.render();
+                initPage.initDeleteButtonEvent(rowCount);
+                initPage.initUploadEvent(rowCount);
+            }
+        };
+
+        $('.layui-btn.btn-questions-manage').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

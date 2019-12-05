@@ -1,0 +1,101 @@
+﻿<title>权限配置</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>配置中心</cite></a>
+        <a><cite>系统角色</cite></a>
+    </div>
+</div>
+
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="roles-search">
+            <div class="layui-form-item">
+                <div class="layui-input-inline">
+                    <select class="sel" id="organization" name="organizationId" lay-filter="organizationfilter"></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-roles" lay-submit lay-filter="roles-search">搜索</button>
+                    <button class="layui-btn btn-roles" data-type="add">添加</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="roles-table" lay-filter="roles-table"></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use('roles', layui.factory('roles')).use(['admin', 'roles', 'table', 'common', 'setter', 'layer', 'laydate'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render();
+
+        //初始化首页机构
+        common.ajax(setter.apiAddress.organization.loadall, "Get", "", {}, function (res) {
+            $("#organization").append("<option value=''>请选择机构</option>");
+            $.each(res.data, function (index, item) {
+                $("#organization").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+            });
+            form.render("select");
+        });
+
+        //搜索
+        form.on('submit(roles-search)', function (data) {
+            //执行重载
+            table.reload('roles-table', {
+                where: data.field
+            });
+        });
+
+        //事件
+        var active = {
+            add: function () {
+                admin.popup({
+                    title: '添加'
+                    , area: ['40%', '30%']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('settings/roles/add').done(function () {
+                            //获取机构
+                            common.ajax(setter.apiAddress.organization.loadall, "GET", "", {}, function (res) {
+                                $("#organizationId").append("<option value=\"\">请选择机构</option>");
+                                $.each(res.data, function (index, item) {
+                                    $("#organizationId").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                                });
+                                form.render("select");
+                            });
+                            //监听提交
+                            form.on('submit(roles-add-form-submit)', function (data) {
+                                data.field.OrganizationName = $('dl.layui-anim .layui-this').html()
+                                common.ajax(setter.apiAddress.roles.add, "POST", "", data.field, function (res) {
+                                    if (res.statusCode == 200) {
+                                        layer.close(index);
+                                        table.reload('roles-table');
+                                    }
+                                    layer.msg(res.message);
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-roles').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

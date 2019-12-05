@@ -1,0 +1,226 @@
+﻿<title>题目管理</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>内容中心</cite></a>
+        <a><cite>题目管理</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="questions-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="abtype-search-sel" name="abtype-search-sel" lay-filter="abtype-search-filter"></select>
+                </div>
+                <div class="layui-inline">
+                    <select class="sel" id="firstabtype-search-sel" name="firstabtype-search-sel" lay-filter="firstabtype-search-filter"></select>
+                </div>
+                <div class="layui-inline">
+                    <select class="sel" id="secondabtype-search-sel" name="secondabtype-search-sel"></select>
+                </div>
+                <div class="layui-inline">
+                    <select id="questiontype-sel" name="questiontype-sel">
+                        <option value="" selected="selected">请选择题目类型</option>
+                        <option value="1">单选题</option>
+                        <option value="2">多选题</option>
+                        <option value="3">量表题</option>
+                        <option value="4">矩阵单选</option>
+                        <option value="5">矩阵多选</option>
+                        <option value="6">矩阵量表</option>
+                    </select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-questions" lay-submit lay-filter="questions-search">搜索</button>
+                    <button class="layui-btn btn-questions" data-type="add">手动添加</button>
+                    <button class="layui-btn btn-questions" data-type="import">批量导入</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="questions-table" lay-filter="questions-table"></table>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use('question', layui.factory('question')).use(['question', 'upload', 'layedit'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , form = layui.form
+            , common = layui.common
+            , upload = layui.upload
+            , layedit = layui.layedit;
+
+        form.render(null, 'questions-search');
+
+        //搜索
+        form.on('submit(questions-search)', function (data) {
+            var field = data.field;
+            var questionType = parseInt($("#questiontype-sel").val()) || -1;
+            //执行重载
+            table.reload('questions-table', {
+                where: {
+                    questionType,
+                    abilityTypeId: $("#abtype-search-sel").val(),
+                    firstAbilityId: $("#firstabtype-search-sel").val(),
+                    secondAbilityId: $("#secondabtype-search-sel").val()
+                },
+                page: {
+                    curr: 1 //重新从第 1 页开始
+                }
+            });
+        });
+
+        $("#firstabtype-search-sel").append("<option value=\"\">请选择一级能力</option>");
+        $("#secondabtype-search-sel").append("<option value=\"\">请选择二级能力</option>");
+        var pageInit = {
+            initabtype: function () {
+                common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: '', level: 0 }, function (res) {
+                    $("#abtype-search-sel").append("<option value=''>请选择能力类型</option>");
+                    $.each(res.data, function (index, item) {
+                        $("#abtype-search-sel").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                    });
+                    form.render("select");
+                });
+            },
+            initFirstAbilities: function (data) {
+                $("#firstabtype-search-sel").empty();
+                if (data.value != "") {
+                    common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                        $("#firstabtype-search-sel").append("<option value=''>请选择一级能力</option>");
+                        $("#secondabtype-search-sel").append("<option value=''>请选择二级能力</option>");
+                        $.each(res.data, function (index, item) {
+                            $("#firstabtype-search-sel").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                        });
+                        form.render("select");
+                    });
+                } else {
+                    common.select("firstabtype-search-sel", [{ id: "", name: "" }], 1, 1);
+                    form.render("select");
+                }
+            },
+            initSecondAbilities: function (data) {
+                $("#secondabtype-search-sel").empty();
+                if (data.value != "") {
+                    common.ajax(setter.apiAddress.ability.selname, "GET", "", { pid: data.value }, function (res) {
+                        $("#secondabtype-search-sel").append("<option value=''>请选择二级能力</option>");
+                        $.each(res.data, function (index, item) {
+                            $("#secondabtype-search-sel").append("<option value=\"" + item.id + "\">" + item.name + "</option>");
+                        });
+                        form.render("select");
+                    });
+                } else {
+                    common.select("secondabtype-search-sel", [{ id: "", name: "" }], 1, 1);
+                    form.render("select");
+                }
+            }
+        };
+
+        pageInit.initabtype();
+        form.on('select(abtype-search-filter)', function (data) {
+            $("#firstabtype-search-sel").empty();
+            $("#secondabtype-search-sel").empty();
+            pageInit.initFirstAbilities(data);
+        });
+        form.on('select(firstabtype-search-filter)', function (data) {
+            $("#secondabtype-search-sel").empty();
+            pageInit.initSecondAbilities(data);
+        });
+
+        var active = {
+            add: function () {
+                location.hash = '/content/question/add';
+            },
+            import: function () {
+                admin.popup({
+                    title: '批量导入题目'
+                    , area: ['600px', '600px']
+                    , resize: false
+                    , success: function (layero, index) {
+                        view(this.id).render('content/question/import').done(function () {
+                            $("#btn-import").hide();
+                            //下载模板
+                            $("#download-template").attr('href', setter.apiAddress.question.gettemplate);
+                            $("#download-template").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //下载错误数据
+                            $("#download-question-result").hide();
+                            $("#download-question-result").attr('href', setter.apiAddress.question.getimportresult);
+                            $("#download-question-result").click(function (event) {
+                                event.stopPropagation();
+                            });
+                            //创建一个上传组件
+                            upload.render({
+                                elem: '#import-questions-from-xls'
+                                , url: setter.apiAddress.question.upload+"?filePath=content/question/import"
+                                , headers: { Authorization: "Bearer " + sessionStorage.getItem("access_token") }
+                                , before: function (obj) { //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+                                    layer.load(); //上传loading
+                                }
+                                , done: function (res, index, upload) {
+                                    layer.closeAll('loading'); //关闭loading
+                                    $("#btn-start-import").attr("disabled", false);
+                                    $("#btn-start-import").removeClass("layui-btn-disabled");
+                                    if (res.statusCode == 205) {
+                                        //有错误数据提示
+                                        var resultHtml = new Array();
+                                        resultHtml.push('<p>');
+                                        resultHtml.push(res.message);
+                                        resultHtml.push('</p>');
+                                        $("#import-result-div").html("");
+                                        $("#import-result-div").append(resultHtml.join(''));
+                                        $("#download-question-result").show();
+                                    } else if (res.statusCode == 202) {
+                                        $("#download-question-result").hide();
+                                        $("#import-result-div").html("");
+                                        //后台验证错误提示
+                                        layer.msg(res.message);
+                                    } else {
+                                        $("#download-question-result").hide();
+                                        $("#import-result-div").html("");
+                                        //全部上传成功
+                                        layer.msg(res.message);
+                                        layer.close(index);
+                                    }
+                                }
+                                , error: function (index, upload) {
+                                    layer.closeAll('loading'); //关闭loading
+                                    layer.msg("导入数据失败!");
+                                }
+                                , accept: 'file'
+                                , field: "excelfile"
+                                , auto: false
+                                , bindAction: '#btn-import'
+                                , acceptMime: '.xlsx'
+                                , exts: 'xlsx'
+                                , size: 50
+                            });
+                            //提交导入
+                            form.on('submit(btn-start-import)', function (data) {
+                                $("#download-question-result").hide();
+                                $("#import-result-div").html("");
+                                if ($(".layui-upload-file").val() != "") {
+                                    $("#btn-import").click();
+                                } else {
+                                    layer.msg("请选择文件");
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        };
+        $('.layui-btn.btn-questions').on('click', function () {
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+    });
+</script>

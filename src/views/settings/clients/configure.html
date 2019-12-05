@@ -1,0 +1,180 @@
+﻿<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-tab layui-tab-brief" lay-filter="client-configure-tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this">连接密码Secrets</li>
+        <li>登录转跳RedirectUris</li>
+        <li>退出转跳LogoutUris</li>
+        <li>作用域Scopes</li>
+        <li>跨域配置CorsOrigins</li>
+    </ul>
+    <div class="layui-tab-content" style="height: 100px;">
+        <!--Secrets-->
+        <div class="layui-tab-item layui-show">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加连接密码</legend>
+            </fieldset>
+            <form class="layui-form" id="secret-form" lay-filter="secret-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">连接密码</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="clientId" name="clientId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="Value" name="Value" lay-verify="required|password" maxlength="20" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">描述</label>
+                        <div class="layui-input-block">
+                            <input type="text" id="Description" name="Description" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="secret-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>连接密码列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="secrets-table" lay-filter="secrets-table"></table>
+                <script type="text/html" id="table-secrets-btn" lay-filter="table-secrets-btn">
+                    <a id="del" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--Secrets-->
+        <!--RedirectUris-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加登录转跳地址</legend>
+            </fieldset>
+            <form class="layui-form" id="redirecturi-form" lay-filter="redirecturi-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">转跳地址</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="clientId" name="clientId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="RedirectUri" name="RedirectUri" lay-verify="required|url" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="redirecturi-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>登录转跳地址列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="redirecturis-table" lay-filter="redirecturis-table"></table>
+                <script type="text/html" id="table-redirecturis-btn" lay-filter="table-redirecturis-btn">
+                    <a id="del" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--RedirectUris-->
+        <!--PostLogoutRedirectUris-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加退出转跳地址</legend>
+            </fieldset>
+            <form class="layui-form" id="logouturis-form" lay-filter="logouturis-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">转跳地址</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="clientId" name="clientId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="PostLogoutRedirectUri" name="PostLogoutRedirectUri" lay-verify="required|url" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="logouturis-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>退出转跳地址列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="logouturis-table" lay-filter="logouturis-table"></table>
+                <script type="text/html" id="table-logouturis-btn" lay-filter="table-logouturis-btn">
+                    <a id="del" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--PostLogoutRedirectUris-->
+        <!--Scopes-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加客户端允许的请求范围</legend>
+            </fieldset>
+            <form class="layui-form" id="scopes-form" lay-filter="scopes-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">请求范围</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="clientId" name="clientId" value="{{ d.params.id || '' }}" lay-verify="required|url" maxlength="100" class="layui-input">
+                            </script>
+                            <input type="text" id="Scope" name="Scope" lay-verify="required" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="scopes-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>客户端允许的请求范围列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="scopes-table" lay-filter="scopes-table"></table>
+                <script type="text/html" id="table-scopes-btn" lay-filter="table-scopes-btn">
+                    <a id="del" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--Scopes-->
+        <!--CorsOrigins-->
+        <div class="layui-tab-item">
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>添加客户端跨域信息</legend>
+            </fieldset>
+            <form class="layui-form" id="corsorigins-form" lay-filter="corsorigins-form">
+                <div class="layui-form-item">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">跨域信息</label>
+                        <div class="layui-input-block">
+                            <script type="text/html" template>
+                                <input type="hidden" id="clientId" name="clientId" value="{{ d.params.id || '' }}" lay-verify="required" class="layui-input">
+                            </script>
+                            <input type="text" id="origin" name="origin" lay-verify="required" maxlength="100" autocomplete="off" placeholder="" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item content-center">
+                        <button type="button" class="layui-btn" lay-submit lay-filter="corsorigins-form-submit">确认保存</button>
+                    </div>
+                </div>
+            </form>
+            <fieldset class="layui-elem-field layui-field-title">
+                <legend>客户端跨域信息列表</legend>
+            </fieldset>
+            <div class="layui-card-body">
+                <table class="layui-table" id="corsorigins-table" lay-filter="corsorigins-table"></table>
+                <script type="text/html" id="table-corsorigins-btn" lay-filter="table-corsorigins-btn">
+                    <a id="del" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="layui-icon layui-icon-delete"></i>删除</a>
+                </script>
+            </div>
+        </div>
+        <!--CorsOrigins-->
+    </div>
+</div>

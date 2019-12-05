@@ -1,0 +1,108 @@
+﻿/**
+ @Name：题目壳模板
+ */
+layui.define(['table', 'form', 'common', 'setter'], function (exports) {
+    var $ = layui.$
+        , admin = layui.admin
+        , view = layui.view
+        , table = layui.table
+        , common = layui.common
+        , setter = layui.setter
+        , form = layui.form;
+
+    table.render({
+        elem: '#questiongrouptemplate-table'
+        , url: setter.apiAddress.questiongrouptemplate.list
+        , cols: [[//表格列数据渲染
+            { field: 'name', title: '模板名称' },
+            {
+                field: 'describetion', title: '说明'
+            },
+            {
+                field: 'questionGroupNum', title: '关联题目壳数', align: 'center', width: 150
+            },
+            { field: 'version', title: '版本', align: 'center', width: 100 },
+            {
+                field: 'status', title: '状态', align: 'center', width: 100,
+                templet: function (d) { return d.status == 1 ? '<span style="color:#009688;">启用</span>' : '<span style="color:#FF5722;">禁用</span>'; }
+            },
+            {
+                width: 150, title: '操作', align: 'center'
+                , templet: function (d) {
+                    var htmlButton = new Array();
+                    htmlButton.push('<div class="layui-btn-group">')
+                    htmlButton.push('<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>编辑</a>');
+                    if (d.status) {
+                        htmlButton.push('<a class="layui-btn  layui-btn-danger layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-close"></i>禁用</a>');
+                    } else {
+                        htmlButton.push('<a class="layui-btn layui-btn-warm layui-btn-xs" lay-event="changestatus"><i class="layui-icon layui-icon-ok"></i>启用</a>');
+                    }
+                    htmlButton.push('</div>')
+                    return htmlButton.join('');
+                }
+            }
+        ]]
+        , page: true
+        , height: 'full-320'
+        , cellMinWidth: 80
+        , text: {
+            none: '暂无相关数据'
+        }
+        , response: {
+            statusCode: 200
+        }
+        , parseData: function (res) {
+            return {
+                "code": res.statusCode,
+                "msg": res.message,
+                "count": res.result.totalCount,
+                "data": res.result.items
+            };
+        }
+    });
+
+    //编辑&修改状态
+    table.on('tool(questiongrouptemplate-table)', function (obj) {
+        var data = obj.data;
+        if (obj.event === 'changestatus') {
+            var titletext = "该模板有" + data.questionGroupNum + "个关联题目壳，确认禁用？";
+            if (!data.status) {
+                titletext = "确认启用该模板？";
+            }
+            layer.confirm(titletext, { icon: 3, title: '提示' }, function (index) {
+                common.ajax(setter.apiAddress.questiongrouptemplate.updatestatus, "POST", "", { id: data.id }, function (res) {
+                    if (res.statusCode == 200) {
+                        layer.close(index);
+                        table.reload('questiongrouptemplate-table');
+                    }
+                    layer.msg(res.message);
+                });
+            });
+        } else if (obj.event === 'edit') {
+            admin.popup({
+                title: '编辑'
+                , area: ['50%', '55%']
+                , resize: true
+                , success: function (layero, index) {
+                    view(this.id).render('content/questiongrouptemplate/edit', data).done(function () {
+                        $("input[name=Status][value=true]").attr("checked", data.status === true);
+                        $("input[name=Status][value=false]").attr("checked", data.status === false);
+                        form.render("radio");
+                        $("textarea[name=Describetion]").val(data.describetion)
+                        //提交
+                        form.on('submit(questiongrouptemplate-form-submit)', function (data) {
+                            common.ajax(setter.apiAddress.questiongrouptemplate.update, "POST", "", data.field, function (res) {
+                                if (res.statusCode == 200) {
+                                    layer.close(index);
+                                    table.reload('questiongrouptemplate-table');
+                                }
+                                layer.msg(res.message);
+                            });
+                        });
+                    });
+                }
+            });
+        }
+    });
+    exports('questiongrouptemplate', {})
+});

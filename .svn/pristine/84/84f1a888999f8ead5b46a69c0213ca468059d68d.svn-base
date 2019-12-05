@@ -1,0 +1,78 @@
+﻿<title>项目课程信息</title>
+<script type="text/html" template>
+    <link rel="stylesheet" href="{{ layui.setter.base }}style/template.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>报告中心</cite></a>
+        <a href="#/report/viewreports/index"><cite>测评报告</cite></a>
+        <a href="javascript:history.go(-1)"><cite>项目课程</cite></a>
+        <a><cite>个人报告</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-card">
+        <div class="layui-form layui-card-header layuiadmin-card-header-auto" lay-filter="projects-search">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <select class="sel" id="gradeclass" name="gradeclass" lay-filter=""></select>
+                </div>
+                <div class="layui-inline">
+                    <button class="layui-btn btn-userreport-search" lay-submit lay-filter="userreport-search">搜索</button>
+                </div>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <table class="layui-table" id="user-table" lay-filter="user-table"></table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    layui.use('personalreport', layui.factory('personalreport')).use(['admin', 'table', 'element', 'laydate', 'common', 'setter', 'layer', 'form', 'personalreport'], function () {
+        var $ = layui.$
+            , admin = layui.admin
+            , view = layui.view
+            , table = layui.table
+            , layer = layui.layer
+            , setter = layui.setter
+            , laydate = layui.laydate
+            , form = layui.form
+            , common = layui.common;
+
+        form.render(null, 'userreport-search');
+
+        //搜索
+        form.on('submit(userreport-search)', function (data) {
+            var field = data.field;
+            //执行重载
+            table.reload('user-table', {
+                where: {
+                    organizationId: layui.router().search.organization,
+                    projectId: layui.router().search.project,
+                    classesId: $("#gradeclass").val(),
+                    courseId: layui.router().search.course,
+                    courseChildId: layui.router().search.courseChild
+                },
+                page: {
+                    curr: 1
+                }
+            });
+        });
+
+        var initPage = {
+            initClass: function (data) {
+                common.ajax(setter.apiAddress.classes.list, "Get", "", { organizationId: layui.router().search.organization }, function (res) {
+                    $("#gradeclass").empty();
+                    $("#gradeclass").append("<option value=\"\">请选择班级</option>");
+                    $.each(res.result, function (index, item) {
+                        $("#gradeclass").append("<option value=\"" + item.id + "\">" + item.gradeName + item.className + "</option>");
+                    });
+                    form.render("select");
+                })
+            }
+        };
+
+        initPage.initClass();
+    });
+</script>
